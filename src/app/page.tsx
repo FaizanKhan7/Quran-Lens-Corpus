@@ -1,43 +1,41 @@
 import Link from "next/link";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { POSBadge, PhraseBadge, HiddenNodeBadge } from "@/components/ui/POSBadge";
 
 export default function HomePage() {
   return (
     <>
       <main
-        className="flex-1 flex flex-col items-center justify-center px-4 pb-16 md:pb-0"
+        className="flex-1 flex flex-col items-center justify-center px-card-padding pb-16 md:pb-0"
         dir="rtl"
       >
-        <div className="w-full max-w-[var(--max-content-width)] mx-auto">
+        <div className="w-full max-w-content mx-auto">
           {/* Hero */}
           <section className="text-center py-16 md:py-24" aria-labelledby="hero-heading">
-            <p
-              className="arabic verse-arabic text-[var(--color-fg-muted)] mb-4"
-              lang="ar"
-            >
+            <p className="arabic verse-arabic text-text-secondary mb-4" lang="ar">
               بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
             </p>
             <h1
               id="hero-heading"
-              className="latin text-3xl md:text-5xl font-bold text-[var(--color-fg)] mb-4"
+              className="latin text-3xl md:text-5xl font-bold text-text-primary mb-4"
               dir="ltr"
             >
               Quran Lens
             </h1>
             <p
-              className="latin text-[var(--color-fg-muted)] text-lg max-w-xl mx-auto mb-10"
+              className="latin text-text-secondary text-latin-lg max-w-prose mx-auto mb-10"
               dir="ltr"
             >
               Explore every word of the Quran — morphology, roots, grammar, and
               syntactic structure. Tap any word to understand it.
             </p>
 
-            <div className="flex justify-center" dir="ltr">
+            <div className="flex gap-3 justify-center flex-wrap" dir="ltr">
               <Link
                 href="/search"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full
-                  bg-[var(--color-pos-verbal)] text-white font-semibold text-base
-                  hover:opacity-90 transition-opacity min-h-[3rem]"
+                  bg-pos-verbal text-text-on-accent font-semibold text-latin-md
+                  hover:opacity-90 transition-opacity duration-base min-h-touch-min"
                 aria-label="Go to search"
               >
                 <svg
@@ -56,32 +54,43 @@ export default function HomePage() {
                 </svg>
                 Search a word or root
               </Link>
+              <Link
+                href="/design-tokens"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full
+                  border border-border-base bg-surface-raised text-text-secondary
+                  hover:bg-surface-overlay transition-colors duration-base min-h-touch-min
+                  latin text-latin-sm"
+                aria-label="View design system tokens"
+                dir="ltr"
+              >
+                Design Tokens →
+              </Link>
             </div>
           </section>
 
-          {/* Design Token Preview — Phase 1 visual verification */}
+          {/* POS preview — using POSBadge component */}
           <section
-            className="border border-[var(--color-border-base)] rounded-xl p-6 mb-8"
-            aria-labelledby="design-tokens-heading"
+            className="border border-border-base rounded-[var(--primitive-radius-12)] p-6 mb-verse-gap"
+            aria-labelledby="pos-heading"
           >
             <h2
-              id="design-tokens-heading"
-              className="latin text-sm font-semibold text-[var(--color-fg-subtle)] mb-4 uppercase tracking-widest"
+              id="pos-heading"
+              className="latin text-latin-xs font-semibold text-text-tertiary mb-4 uppercase tracking-widest"
               dir="ltr"
             >
-              POS Color System (Triple Encoding — spec §8.3)
+              POS Color System — Triple Encoding (spec §8.3)
             </h2>
-            <div className="flex flex-wrap gap-3 justify-center" dir="ltr">
-              <span className="pos-badge pos-badge--nominal">N</span>
-              <span className="pos-badge pos-badge--nominal">PN</span>
-              <span className="pos-badge pos-badge--nominal">ADJ</span>
-              <span className="pos-badge pos-badge--verbal">V</span>
-              <span className="pos-badge pos-badge--particle">P</span>
-              <span className="pos-badge pos-badge--particle">CONJ</span>
-              <span className="pos-badge pos-badge--particle">NEG</span>
-              <span className="pos-badge pos-badge--special">INL</span>
-              <span className="pos-badge pos-badge--phrase">NS</span>
-              <span className="pos-badge pos-badge--hidden">(*)</span>
+            <div className="flex flex-wrap gap-3 items-center justify-center" dir="ltr">
+              <POSBadge tag="N" />
+              <POSBadge tag="PN" />
+              <POSBadge tag="ADJ" />
+              <POSBadge tag="V" />
+              <POSBadge tag="P" />
+              <POSBadge tag="CONJ" />
+              <POSBadge tag="NEG" />
+              <POSBadge tag="INL" />
+              <PhraseBadge tag="NS" />
+              <HiddenNodeBadge />
             </div>
           </section>
 
@@ -89,35 +98,28 @@ export default function HomePage() {
           <section aria-labelledby="browse-heading">
             <h2
               id="browse-heading"
-              className="latin text-lg font-semibold text-[var(--color-fg)] mb-4"
+              className="latin text-latin-lg font-semibold text-text-primary mb-4"
               dir="ltr"
             >
               Browse Surahs
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-word-gap">
               {SAMPLE_SURAHS.map((surah) => (
                 <Link
                   key={surah.id}
                   href={`/surah/${surah.id}`}
-                  className="flex flex-col items-center gap-1 p-4 rounded-lg
-                    border border-[var(--color-border-base)]
-                    bg-[var(--color-bg-raised)]
-                    hover:border-[var(--color-pos-verbal-display)]
-                    transition-colors min-h-[3rem]"
+                  className="flex flex-col items-center gap-1 p-4 rounded-[var(--primitive-radius-8)]
+                    border border-border-base bg-surface-raised
+                    hover:border-pos-verbal hover:bg-surface-overlay
+                    transition-colors duration-base min-h-touch-min"
                 >
-                  <span
-                    className="latin text-xs text-[var(--color-fg-muted)]"
-                    dir="ltr"
-                  >
+                  <span className="latin text-latin-xs text-text-tertiary" dir="ltr">
                     {surah.id}
                   </span>
-                  <span className="arabic text-base" lang="ar">
+                  <span className="arabic text-arabic-md" lang="ar">
                     {surah.nameArabic}
                   </span>
-                  <span
-                    className="latin text-xs text-[var(--color-fg-subtle)]"
-                    dir="ltr"
-                  >
+                  <span className="latin text-latin-xs text-text-secondary" dir="ltr">
                     {surah.nameSimple}
                   </span>
                 </Link>
@@ -126,7 +128,7 @@ export default function HomePage() {
             <div className="mt-4 text-center" dir="ltr">
               <Link
                 href="/surah"
-                className="inline-link latin text-sm text-[var(--color-pos-verbal-display)] hover:underline"
+                className="inline-link latin text-latin-sm text-pos-verbal hover:underline"
               >
                 View all 114 surahs →
               </Link>
@@ -140,14 +142,13 @@ export default function HomePage() {
   );
 }
 
-// Stub data — replaced by API in Phase 1 Step 4
 const SAMPLE_SURAHS = [
-  { id: 1, nameArabic: "ٱلْفَاتِحَة", nameSimple: "Al-Fatihah" },
-  { id: 2, nameArabic: "ٱلْبَقَرَة", nameSimple: "Al-Baqarah" },
-  { id: 3, nameArabic: "آلِ عِمْرَان", nameSimple: "Ali 'Imran" },
-  { id: 4, nameArabic: "ٱلنِّسَاء", nameSimple: "An-Nisa" },
-  { id: 18, nameArabic: "ٱلْكَهْف", nameSimple: "Al-Kahf" },
-  { id: 36, nameArabic: "يس", nameSimple: "Ya-Sin" },
-  { id: 55, nameArabic: "ٱلرَّحْمَـٰن", nameSimple: "Ar-Rahman" },
+  { id: 1,   nameArabic: "ٱلْفَاتِحَة",  nameSimple: "Al-Fatihah" },
+  { id: 2,   nameArabic: "ٱلْبَقَرَة",   nameSimple: "Al-Baqarah" },
+  { id: 3,   nameArabic: "آلِ عِمْرَان", nameSimple: "Ali 'Imran" },
+  { id: 4,   nameArabic: "ٱلنِّسَاء",   nameSimple: "An-Nisa" },
+  { id: 18,  nameArabic: "ٱلْكَهْف",    nameSimple: "Al-Kahf" },
+  { id: 36,  nameArabic: "يس",          nameSimple: "Ya-Sin" },
+  { id: 55,  nameArabic: "ٱلرَّحْمَـٰن", nameSimple: "Ar-Rahman" },
   { id: 112, nameArabic: "ٱلْإِخْلَاص", nameSimple: "Al-Ikhlas" },
 ] as const;

@@ -1,0 +1,108 @@
+/*
+ * COMPONENT TOKENS
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Component-specific tokens. Each references semantic tokens — never primitives.
+ * When a component needs tuning, change only here; semantic layer stays clean.
+ *
+ * Naming: --comp-{component}-{property}
+ */
+
+:root {
+  /* ── WordCard (spec §10.1) ─────────────────────────────────────────────── */
+
+  --comp-word-card-padding:          var(--token-space-card-padding);
+  --comp-word-card-radius:           var(--primitive-radius-8);
+  --comp-word-card-border:           var(--token-border-base);
+  --comp-word-card-bg:               var(--token-surface-raised);
+  --comp-word-card-bg-hover:         var(--token-surface-overlay);
+  --comp-word-card-shadow:           var(--token-shadow-card);
+  --comp-word-card-shadow-hover:     var(--token-shadow-raised);
+  --comp-word-card-transition:       var(--token-motion-base) var(--token-motion-easing);
+
+  /* Tier 1 — Glance (always visible) */
+  --comp-word-card-arabic-size:      var(--token-font-size-arabic-md);
+  --comp-word-card-gloss-size:       var(--token-font-size-latin-sm);
+  --comp-word-card-gloss-color:      var(--token-text-secondary);
+
+  /* Tier 2 — Expanded details */
+  --comp-word-card-detail-size:      var(--token-font-size-latin-sm);
+  --comp-word-card-detail-color:     var(--token-text-secondary);
+  --comp-word-card-root-size:        var(--token-font-size-arabic-sm);
+
+  /* ── VerseAccordion (spec §10.2) ───────────────────────────────────────── */
+
+  --comp-verse-gap:                  var(--token-space-verse-gap);
+  --comp-verse-padding-x:            var(--token-space-card-padding);
+  --comp-verse-padding-y:            var(--primitive-space-12);
+  --comp-verse-radius:               var(--primitive-radius-8);
+  --comp-verse-border:               var(--token-border-subtle);
+  --comp-verse-number-size:          var(--token-font-size-latin-xs);
+  --comp-verse-number-color:         var(--token-text-tertiary);
+
+  /* ── POS Badge (spec §10.6 + §8.3) ────────────────────────────────────── */
+
+  --comp-badge-font-size:            var(--token-font-size-latin-xs);  /* 11px */
+  --comp-badge-font-weight:          var(--primitive-weight-semibold);
+  --comp-badge-padding-x:            var(--primitive-space-6);
+  --comp-badge-padding-y:            var(--primitive-space-2);
+  --comp-badge-border-width:         1px;
+
+  /* Shape per POS category (spec §8.3) */
+  --comp-badge-radius-nominal:       var(--primitive-radius-2);    /* Rectangle */
+  --comp-badge-radius-verbal:        var(--primitive-radius-4);    /* Rounded rect */
+  --comp-badge-radius-particle:      var(--primitive-radius-full); /* Pill */
+  --comp-badge-radius-special:       var(--primitive-radius-2);    /* Diamond (rotated) */
+  --comp-badge-radius-phrase:        var(--primitive-radius-4);
+  --comp-badge-radius-hidden:        var(--primitive-radius-4);
+
+  /* ── SearchBar (spec §10.4) ────────────────────────────────────────────── */
+
+  --comp-search-height:              var(--token-space-touch-min);  /* 48px */
+  --comp-search-padding-x:          var(--primitive-space-16);
+  --comp-search-radius:              var(--primitive-radius-full);
+  --comp-search-border:              var(--token-border-base);
+  --comp-search-border-focus:        var(--token-interactive-focus);
+  --comp-search-bg:                  var(--token-surface-raised);
+  --comp-search-font-size:           var(--token-font-size-latin-md);
+  --comp-search-placeholder-color:   var(--token-text-tertiary);
+
+  /* ── TreebankViewer (spec §10.3) ───────────────────────────────────────── */
+
+  --comp-treebank-node-size:         var(--primitive-space-48);    /* 48px per spec §8.2 */
+  --comp-treebank-node-radius:       var(--primitive-radius-8);
+  --comp-treebank-edge-color:        var(--token-border-strong);
+  --comp-treebank-edge-width:        1.5px;
+  --comp-treebank-edge-label-size:   var(--token-font-size-latin-xs);
+  --comp-treebank-bg:                var(--token-surface-base);
+
+  /* ── Bottom Navigation (spec §9.4) ────────────────────────────────────── */
+
+  --comp-bottom-nav-height:          3.5rem;                       /* 56px */
+  --comp-bottom-nav-bg:              var(--token-surface-base);
+  --comp-bottom-nav-border:          var(--token-border-subtle);
+  --comp-bottom-nav-item-color:      var(--token-text-secondary);
+  --comp-bottom-nav-item-active:     var(--token-pos-verbal);
+  --comp-bottom-nav-label-size:      var(--token-font-size-latin-xs);
+
+  /* ── MorphologyBadge tooltip ───────────────────────────────────────────── */
+
+  --comp-tooltip-bg:                 var(--token-surface-inverse);
+  --comp-tooltip-color:              var(--token-text-inverse);
+  --comp-tooltip-radius:             var(--primitive-radius-4);
+  --comp-tooltip-padding-x:          var(--primitive-space-8);
+  --comp-tooltip-padding-y:          var(--primitive-space-4);
+  --comp-tooltip-font-size:          var(--token-font-size-latin-sm);
+  --comp-tooltip-shadow:             var(--token-shadow-raised);
+
+  /* ── FilterPanel (spec §10.5) ──────────────────────────────────────────── */
+
+  --comp-filter-chip-radius:         var(--primitive-radius-full);
+  --comp-filter-chip-padding-x:      var(--primitive-space-12);
+  --comp-filter-chip-padding-y:      var(--primitive-space-6);
+  --comp-filter-chip-border:         var(--token-border-base);
+  --comp-filter-chip-bg:             var(--token-surface-raised);
+  --comp-filter-chip-bg-active:      var(--token-pos-verbal-bg);
+  --comp-filter-chip-border-active:  var(--token-pos-verbal);
+  --comp-filter-chip-color-active:   var(--token-pos-verbal);
+  --comp-filter-chip-font-size:      var(--token-font-size-latin-sm);
+}

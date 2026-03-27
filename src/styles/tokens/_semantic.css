@@ -1,0 +1,191 @@
+/*
+ * SEMANTIC TOKENS
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Purpose-mapped tokens. Each one answers "what is it for?" not "what is it?"
+ * All values reference primitives — never raw hex or px here.
+ *
+ * Two blocks:
+ *   :root         — light mode (default)
+ *   [data-theme="dark"] — dark mode overrides
+ *
+ * Naming: --token-{category}-{role}
+ */
+
+/* ── Light Mode (Default) ──────────────────────────────────────────────────── */
+
+:root {
+  /* Surface */
+  --token-surface-base:     var(--primitive-neutral-0);
+  --token-surface-raised:   var(--primitive-neutral-50);
+  --token-surface-overlay:  var(--primitive-neutral-100);
+  --token-surface-sunken:   var(--primitive-neutral-200);
+  --token-surface-inverse:  var(--primitive-neutral-950);
+
+  /* Text */
+  --token-text-primary:   var(--primitive-neutral-950);
+  --token-text-secondary: var(--primitive-gray-600);
+  --token-text-tertiary:  var(--primitive-gray-500);
+  --token-text-disabled:  var(--primitive-gray-400);
+  --token-text-inverse:   var(--primitive-neutral-0);
+  --token-text-on-accent: var(--primitive-neutral-0);
+
+  /* Border */
+  --token-border-subtle:   var(--primitive-neutral-200);
+  --token-border-base:     var(--primitive-gray-200);
+  --token-border-strong:   var(--primitive-gray-300);
+  --token-border-inverse:  var(--primitive-gray-700);
+
+  /* Interactive */
+  --token-interactive-focus:    var(--primitive-blue-800);
+  --token-interactive-hover-bg: var(--primitive-neutral-100);
+  --token-interactive-active-bg: var(--primitive-neutral-200);
+
+  /* ── POS Colors — light mode (spec §8.3) ─────────────────────────────── */
+
+  /* Nominal (N, PN, ADJ, IMPN, PRON, DEM, REL, T, LOC) */
+  --token-pos-nominal:       var(--primitive-green-800);
+  --token-pos-nominal-bg:    var(--primitive-green-50);
+  --token-pos-nominal-ring:  var(--primitive-green-400);
+
+  /* Verbal (V) */
+  --token-pos-verbal:        var(--primitive-blue-800);
+  --token-pos-verbal-bg:     var(--primitive-blue-50);
+  --token-pos-verbal-ring:   var(--primitive-blue-300);
+
+  /* Particle (P, CONJ, NEG, COND …) */
+  --token-pos-particle:      var(--primitive-red-800);
+  --token-pos-particle-bg:   var(--primitive-red-50);
+  --token-pos-particle-ring: var(--primitive-red-200);
+
+  /* Special (INL — Quranic initials) */
+  --token-pos-special:       var(--primitive-purple-800);
+  --token-pos-special-bg:    var(--primitive-purple-50);
+  --token-pos-special-ring:  var(--primitive-purple-200);
+
+  /* Phrase nodes (S, NS, VS, CS, PP, SC) */
+  --token-pos-phrase:        var(--primitive-slate-700);
+  --token-pos-phrase-bg:     var(--primitive-slate-50);
+  --token-pos-phrase-ring:   var(--primitive-slate-200);
+
+  /* Hidden / pro-drop (*) */
+  --token-pos-hidden:        var(--primitive-gray-500);
+  --token-pos-hidden-bg:     var(--primitive-gray-100);
+  --token-pos-hidden-ring:   var(--primitive-gray-300);
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
+
+  /* Arabic */
+  --token-font-arabic:         var(--font-amiri), "Amiri", serif;
+  --token-font-size-arabic-sm: var(--primitive-text-16);
+  --token-font-size-arabic-md: var(--primitive-text-18);   /* body minimum per spec §8.4 */
+  --token-font-size-arabic-lg: var(--primitive-text-24);   /* verse display minimum */
+  --token-font-size-arabic-xl: var(--primitive-text-32);
+  --token-leading-arabic:      var(--primitive-leading-loose);  /* 1.7 per spec §8.4 */
+
+  /* Latin */
+  --token-font-latin:          var(--font-inter), system-ui, sans-serif;
+  --token-font-size-latin-xs:  var(--primitive-text-11);
+  --token-font-size-latin-sm:  var(--primitive-text-14);
+  --token-font-size-latin-md:  var(--primitive-text-16);   /* body minimum per spec §8.4 */
+  --token-font-size-latin-lg:  var(--primitive-text-20);
+  --token-font-size-latin-xl:  var(--primitive-text-28);
+  --token-leading-latin:       var(--primitive-leading-normal); /* 1.5 per spec §8.4 */
+
+  /* Mono */
+  --token-font-mono: var(--font-geist-mono), "GeistMono", monospace;
+
+  /* ── Spacing Aliases (spec §8.5) ─────────────────────────────────────── */
+
+  --token-space-verse-gap:     var(--primitive-space-24); /* 24px between verses */
+  --token-space-word-gap:      var(--primitive-space-8);  /* 8px between words */
+  --token-space-card-padding:  var(--primitive-space-16); /* 16px card padding */
+  --token-space-section-gap:   var(--primitive-space-32); /* 32px between sections */
+  --token-space-touch-min:     var(--primitive-space-48); /* 48px min touch target */
+
+  /* ── Layout ──────────────────────────────────────────────────────────── */
+
+  --token-layout-max-content: var(--primitive-max-width-content);
+  --token-layout-max-prose:   var(--primitive-max-width-prose);
+  --token-layout-max-narrow:  var(--primitive-max-width-narrow);
+
+  /* ── Motion ──────────────────────────────────────────────────────────── */
+
+  --token-motion-fast:    var(--primitive-duration-fast);
+  --token-motion-base:    var(--primitive-duration-base);
+  --token-motion-slow:    var(--primitive-duration-slow);
+  --token-motion-easing:  var(--primitive-ease-default);
+
+  /* ── Elevation ───────────────────────────────────────────────────────── */
+
+  --token-shadow-card:    var(--primitive-shadow-1);
+  --token-shadow-raised:  var(--primitive-shadow-2);
+  --token-shadow-overlay: var(--primitive-shadow-4);
+}
+
+/* ── Dark Mode Overrides ──────────────────────────────────────────────────── */
+
+[data-theme="dark"] {
+  /* Surface */
+  --token-surface-base:     var(--primitive-gray-950);
+  --token-surface-raised:   var(--primitive-gray-900);
+  --token-surface-overlay:  var(--primitive-gray-800);
+  --token-surface-sunken:   #0d0d0d;
+  --token-surface-inverse:  var(--primitive-neutral-0);
+
+  /* Text */
+  --token-text-primary:   #ededed;
+  --token-text-secondary: var(--primitive-gray-400);
+  --token-text-tertiary:  var(--primitive-gray-500);
+  --token-text-disabled:  var(--primitive-gray-700);
+  --token-text-inverse:   var(--primitive-neutral-950);
+  --token-text-on-accent: var(--primitive-neutral-0);
+
+  /* Border */
+  --token-border-subtle:   var(--primitive-gray-800);
+  --token-border-base:     var(--primitive-gray-700);
+  --token-border-strong:   var(--primitive-gray-600);
+  --token-border-inverse:  var(--primitive-gray-300);
+
+  /* Interactive */
+  --token-interactive-focus:     var(--primitive-blue-300);
+  --token-interactive-hover-bg:  rgba(255 255 255 / 0.05);
+  --token-interactive-active-bg: rgba(255 255 255 / 0.08);
+
+  /* ── POS Colors — dark mode, lightened for contrast (spec §8.3) ─────── */
+
+  /* Nominal */
+  --token-pos-nominal:       var(--primitive-green-400);
+  --token-pos-nominal-bg:    rgba(129 199 132 / 0.1);
+  --token-pos-nominal-ring:  var(--primitive-green-700);
+
+  /* Verbal */
+  --token-pos-verbal:        var(--primitive-blue-300);
+  --token-pos-verbal-bg:     rgba(100 181 246 / 0.1);
+  --token-pos-verbal-ring:   var(--primitive-blue-800);
+
+  /* Particle */
+  --token-pos-particle:      var(--primitive-red-200);
+  --token-pos-particle-bg:   rgba(239 154 154 / 0.1);
+  --token-pos-particle-ring: var(--primitive-red-900);
+
+  /* Special */
+  --token-pos-special:       var(--primitive-purple-200);
+  --token-pos-special-bg:    rgba(206 147 216 / 0.1);
+  --token-pos-special-ring:  var(--primitive-purple-900);
+
+  /* Phrase */
+  --token-pos-phrase:        var(--primitive-slate-300);
+  --token-pos-phrase-bg:     rgba(144 164 174 / 0.1);
+  --token-pos-phrase-ring:   var(--primitive-slate-700);
+
+  /* Hidden */
+  --token-pos-hidden:        #616161;
+  --token-pos-hidden-bg:     rgba(97 97 97 / 0.1);
+  --token-pos-hidden-ring:   var(--primitive-gray-700);
+
+  /* ── Elevation (darker shadows for dark surfaces) ────────────────────── */
+
+  --token-shadow-card:    0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --token-shadow-raised:  0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  --token-shadow-overlay: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+}

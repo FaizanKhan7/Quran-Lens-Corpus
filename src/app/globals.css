@@ -1,159 +1,177 @@
-@import "tailwindcss";
+/*
+ * GLOBALS.CSS
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Import order:
+ *   1. Tailwind base
+ *   2. Primitive tokens  (raw values)
+ *   3. Semantic tokens   (purpose-mapped, theme-switchable)
+ *   4. Component tokens  (per-component props)
+ *   5. @theme            (maps tokens → Tailwind utilities)
+ *   6. Base styles       (html, body, typography, focus, scrollbar)
+ *   7. Utility classes   (pos-badge, verse-arabic, etc.)
+ */
 
-/* ─── Primitive Tokens ────────────────────────────────────────────────────── */
+@import "tailwindcss";
+@import "../styles/tokens/_primitive.css";
+@import "../styles/tokens/_semantic.css";
+@import "../styles/tokens/_component.css";
+
+/* ─── Tailwind Theme Mapping ──────────────────────────────────────────────── */
+/*
+ * Exposes semantic tokens as Tailwind utility classes.
+ * e.g. --color-surface → bg-surface, text-surface, border-surface
+ *      --spacing-verse-gap → gap-verse-gap, mt-verse-gap, p-verse-gap
+ *      --text-arabic-md → text-arabic-md
+ */
 
 @theme inline {
   /* Fonts */
-  --font-arabic: var(--font-amiri);
-  --font-latin: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
+  --font-arabic: var(--token-font-arabic);
+  --font-latin:  var(--token-font-latin);
+  --font-mono:   var(--token-font-mono);
 
-  /* Spacing scale */
-  --spacing-verse-gap: 1.5rem;   /* 24px */
-  --spacing-word-gap: 0.5rem;    /* 8px */
-  --spacing-card-padding: 1rem;  /* 16px */
-  --spacing-section-gap: 2rem;   /* 32px */
-  --spacing-touch-min: 3rem;     /* 48px */
+  /* Surface colors → bg-surface, bg-surface-raised, bg-surface-overlay … */
+  --color-surface:         var(--token-surface-base);
+  --color-surface-raised:  var(--token-surface-raised);
+  --color-surface-overlay: var(--token-surface-overlay);
+  --color-surface-sunken:  var(--token-surface-sunken);
+  --color-surface-inverse: var(--token-surface-inverse);
 
-  /* Typography — Arabic */
-  --font-size-arabic-body: 1.125rem;  /* 18px */
-  --font-size-arabic-verse: 1.5rem;   /* 24px */
-  --line-height-arabic: 1.7;
+  /* Text colors → text-primary, text-secondary … */
+  --color-text-primary:   var(--token-text-primary);
+  --color-text-secondary: var(--token-text-secondary);
+  --color-text-tertiary:  var(--token-text-tertiary);
+  --color-text-disabled:  var(--token-text-disabled);
+  --color-text-inverse:   var(--token-text-inverse);
+  --color-text-on-accent: var(--token-text-on-accent);
 
-  /* Typography — Latin */
-  --font-size-latin-body: 1rem;       /* 16px */
-  --font-size-latin-small: 0.875rem;  /* 14px */
-  --line-height-latin: 1.5;
+  /* Border colors → border-subtle, border-base, border-strong */
+  --color-border-subtle: var(--token-border-subtle);
+  --color-border-base:   var(--token-border-base);
+  --color-border-strong: var(--token-border-strong);
 
-  /* Layout */
-  --max-content-width: 60rem; /* 960px */
+  /* Interactive */
+  --color-focus-ring:      var(--token-interactive-focus);
+  --color-hover-bg:        var(--token-interactive-hover-bg);
+  --color-active-bg:       var(--token-interactive-active-bg);
 
-  /* ── POS Color Tokens (Light Mode) ── */
-  --color-pos-nominal: #2e7d32;
-  --color-pos-verbal: #1565c0;
-  --color-pos-particle: #c62828;
-  --color-pos-special: #6a1b9a;
-  --color-pos-phrase: #455a64;
-  --color-pos-hidden: #9e9e9e;
+  /* POS Colors → text-pos-nominal, bg-pos-nominal, border-pos-nominal … */
+  --color-pos-nominal:      var(--token-pos-nominal);
+  --color-pos-nominal-bg:   var(--token-pos-nominal-bg);
+  --color-pos-verbal:       var(--token-pos-verbal);
+  --color-pos-verbal-bg:    var(--token-pos-verbal-bg);
+  --color-pos-particle:     var(--token-pos-particle);
+  --color-pos-particle-bg:  var(--token-pos-particle-bg);
+  --color-pos-special:      var(--token-pos-special);
+  --color-pos-special-bg:   var(--token-pos-special-bg);
+  --color-pos-phrase:       var(--token-pos-phrase);
+  --color-pos-phrase-bg:    var(--token-pos-phrase-bg);
+  --color-pos-hidden:       var(--token-pos-hidden);
+  --color-pos-hidden-bg:    var(--token-pos-hidden-bg);
 
-  /* ── Surface & Foreground Tokens ── */
-  --color-surface: var(--color-bg);
-  --color-surface-raised: var(--color-bg-raised);
-  --color-surface-overlay: var(--color-bg-overlay);
-  --color-text-primary: var(--color-fg);
-  --color-text-secondary: var(--color-fg-muted);
-  --color-text-tertiary: var(--color-fg-subtle);
-  --color-border: var(--color-border-base);
-  --color-focus-ring: #1565c0;
-}
+  /* Spacing → gap-verse-gap, p-word-gap, mt-card-padding … */
+  --spacing-verse-gap:    var(--token-space-verse-gap);
+  --spacing-word-gap:     var(--token-space-word-gap);
+  --spacing-card-padding: var(--token-space-card-padding);
+  --spacing-section-gap:  var(--token-space-section-gap);
+  --spacing-touch-min:    var(--token-space-touch-min);
 
-/* ─── Light Mode Variables ────────────────────────────────────────────────── */
+  /* Max widths → max-w-content, max-w-prose, max-w-narrow */
+  --width-content: var(--token-layout-max-content);
+  --width-prose:   var(--token-layout-max-prose);
+  --width-narrow:  var(--token-layout-max-narrow);
 
-:root {
-  --color-bg: #ffffff;
-  --color-bg-raised: #f8f9fa;
-  --color-bg-overlay: #f1f3f5;
-  --color-fg: #0a0a0a;
-  --color-fg-muted: #4a5568;
-  --color-fg-subtle: #718096;
-  --color-border-base: #e2e8f0;
+  /* Font sizes → text-arabic-md, text-arabic-lg, text-latin-sm … */
+  --text-arabic-sm: var(--token-font-size-arabic-sm);
+  --text-arabic-md: var(--token-font-size-arabic-md);
+  --text-arabic-lg: var(--token-font-size-arabic-lg);
+  --text-arabic-xl: var(--token-font-size-arabic-xl);
+  --text-latin-xs:  var(--token-font-size-latin-xs);
+  --text-latin-sm:  var(--token-font-size-latin-sm);
+  --text-latin-md:  var(--token-font-size-latin-md);
+  --text-latin-lg:  var(--token-font-size-latin-lg);
+  --text-latin-xl:  var(--token-font-size-latin-xl);
 
-  /* POS dark mode overrides reset */
-  --color-pos-nominal-display: #2e7d32;
-  --color-pos-verbal-display: #1565c0;
-  --color-pos-particle-display: #c62828;
-  --color-pos-special-display: #6a1b9a;
-  --color-pos-phrase-display: #455a64;
-  --color-pos-hidden-display: #9e9e9e;
-}
+  /* Line heights → leading-arabic, leading-latin */
+  --leading-arabic: var(--token-leading-arabic);
+  --leading-latin:  var(--token-leading-latin);
 
-/* ─── Dark Mode Variables ─────────────────────────────────────────────────── */
+  /* Shadows → shadow-card, shadow-raised, shadow-overlay */
+  --shadow-card:    var(--token-shadow-card);
+  --shadow-raised:  var(--token-shadow-raised);
+  --shadow-overlay: var(--token-shadow-overlay);
 
-[data-theme="dark"] {
-  --color-bg: #0a0a0a;
-  --color-bg-raised: #141414;
-  --color-bg-overlay: #1a1a1a;
-  --color-fg: #ededed;
-  --color-fg-muted: #a0aec0;
-  --color-fg-subtle: #718096;
-  --color-border-base: #2d3748;
-
-  /* POS colors lighten for dark mode (spec §8.3) */
-  --color-pos-nominal-display: #81c784;
-  --color-pos-verbal-display: #64b5f6;
-  --color-pos-particle-display: #ef9a9a;
-  --color-pos-special-display: #ce93d8;
-  --color-pos-phrase-display: #90a4ae;
-  --color-pos-hidden-display: #616161;
+  /* Animation durations */
+  --duration-fast:   var(--token-motion-fast);
+  --duration-base:   var(--token-motion-base);
+  --duration-slow:   var(--token-motion-slow);
+  --ease-default:    var(--token-motion-easing);
 }
 
 /* ─── Base Styles ─────────────────────────────────────────────────────────── */
 
 html {
-  /* RTL-first as per spec §15.1 */
-  direction: rtl;
+  direction: rtl; /* RTL-first per spec §15.1 */
   scroll-behavior: smooth;
+  text-size-adjust: 100%;
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-fg);
-  font-family: var(--font-latin), system-ui, sans-serif;
-  font-size: var(--font-size-latin-body);
-  line-height: var(--line-height-latin);
+  background-color: var(--token-surface-base);
+  color: var(--token-text-primary);
+  font-family: var(--token-font-latin);
+  font-size: var(--token-font-size-latin-md);
+  line-height: var(--token-leading-latin);
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Arabic text base */
+/* Arabic text context */
 [lang="ar"],
-[dir="rtl"] .arabic,
 .arabic {
-  font-family: var(--font-arabic), "Amiri", serif;
-  font-size: var(--font-size-arabic-body);
-  line-height: var(--line-height-arabic);
+  font-family: var(--token-font-arabic);
+  font-size: var(--token-font-size-arabic-md);
+  line-height: var(--token-leading-arabic);
   direction: rtl;
-  /* No bold, no italic on Arabic — spec §8.4 */
-  font-weight: 400;
-  font-style: normal;
+  font-weight: var(--primitive-weight-regular); /* Never bold on Arabic — spec §8.4 */
+  font-style: normal;                           /* Never italic on Arabic — spec §8.4 */
 }
 
-/* Latin content within RTL context flips direction back */
+/* Latin within RTL context */
 [dir="ltr"],
 .latin {
   direction: ltr;
-  font-family: var(--font-latin), system-ui, sans-serif;
+  font-family: var(--token-font-latin);
 }
 
-/* ─── Focus Styles (WCAG 2.2 §14.1) ──────────────────────────────────────── */
+/* ─── Focus Styles (WCAG 2.2 AA — spec §14.1) ────────────────────────────── */
 
 :focus-visible {
-  outline: 2px solid var(--color-focus-ring);
+  outline: 2px solid var(--token-interactive-focus);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: var(--primitive-radius-2);
 }
 
-/* Never hide focused elements behind sticky headers */
 :target {
-  scroll-margin-top: 4rem;
+  scroll-margin-top: 4rem; /* Never hide focused elements behind sticky headers */
 }
 
-/* ─── Touch Target Enforcement (spec §8.5) ────────────────────────────────── */
+/* ─── Touch Targets (min 48×48dp — spec §8.5 + §14.4) ────────────────────── */
 
 button,
 a,
 [role="button"],
 [role="tab"],
 [role="menuitem"] {
-  min-height: var(--spacing-touch-min);
-  min-width: var(--spacing-touch-min);
+  min-height: var(--token-space-touch-min);
+  min-width: var(--token-space-touch-min);
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Reset for purely decorative inline links */
+/* Inline text links opt out of the touch target enforcement */
 a.inline-link {
   min-height: unset;
   min-width: unset;
@@ -168,85 +186,119 @@ a.inline-link {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-bg-overlay);
+  background: var(--token-surface-overlay);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border-base);
-  border-radius: 3px;
+  background: var(--token-border-base);
+  border-radius: var(--primitive-radius-4);
 }
 
 /* ─── Selection ───────────────────────────────────────────────────────────── */
 
 ::selection {
-  background-color: #1565c033;
-  color: var(--color-fg);
+  background-color: color-mix(in srgb, var(--token-pos-verbal) 20%, transparent);
+  color: var(--token-text-primary);
 }
 
-/* ─── Verse Arabic Text ───────────────────────────────────────────────────── */
+/* ─── Utility Classes ─────────────────────────────────────────────────────── */
 
+/*
+ * Verse-level Arabic text
+ * Usage: <p className="verse-arabic">بِسْمِ ٱللَّهِ</p>
+ */
 .verse-arabic {
-  font-family: var(--font-arabic), "Amiri", serif;
-  font-size: var(--font-size-arabic-verse);
-  line-height: var(--line-height-arabic);
+  font-family: var(--token-font-arabic);
+  font-size: var(--token-font-size-arabic-lg);
+  line-height: var(--token-leading-arabic);
   direction: rtl;
-  font-weight: 400;
+  font-weight: var(--primitive-weight-regular);
+  font-style: normal;
 }
 
-/* ─── POS Badge Base (color + text + shape — triple encoding, spec §8.3) ─── */
+/*
+ * POS Badge — Triple encoding: color + text abbreviation + shape (spec §8.3)
+ *
+ * Base class:  pos-badge
+ * Modifiers:   pos-badge--nominal  (Rectangle,     green)
+ *              pos-badge--verbal   (Rounded rect,  blue)
+ *              pos-badge--particle (Pill/capsule,  red)
+ *              pos-badge--special  (Diamond,       purple)
+ *              pos-badge--phrase   (Rounded+dashed,slate)
+ *              pos-badge--hidden   (Dotted outline,gray)
+ *
+ * Usage: <span className="pos-badge pos-badge--nominal">N</span>
+ */
 
 .pos-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.6875rem; /* 11px */
-  font-weight: 600;
+  font-size: var(--comp-badge-font-size);
+  font-weight: var(--comp-badge-font-weight);
   line-height: 1;
-  padding: 2px 6px;
-  border-width: 1px;
+  padding: var(--comp-badge-padding-y) var(--comp-badge-padding-x);
+  border-width: var(--comp-badge-border-width);
   border-style: solid;
-  font-family: var(--font-latin), system-ui, sans-serif;
+  font-family: var(--token-font-latin);
   direction: ltr;
+  white-space: nowrap;
+  flex-shrink: 0;
+  /* Override touch target min-h/min-w for badges */
+  min-height: unset;
+  min-width: unset;
 }
 
 .pos-badge--nominal {
-  color: var(--color-pos-nominal-display);
-  border-color: var(--color-pos-nominal-display);
-  border-radius: 2px; /* Rectangle */
+  color: var(--token-pos-nominal);
+  background-color: var(--token-pos-nominal-bg);
+  border-color: var(--token-pos-nominal);
+  border-radius: var(--comp-badge-radius-nominal);
 }
 
 .pos-badge--verbal {
-  color: var(--color-pos-verbal-display);
-  border-color: var(--color-pos-verbal-display);
-  border-radius: 4px; /* Rounded rect */
+  color: var(--token-pos-verbal);
+  background-color: var(--token-pos-verbal-bg);
+  border-color: var(--token-pos-verbal);
+  border-radius: var(--comp-badge-radius-verbal);
 }
 
 .pos-badge--particle {
-  color: var(--color-pos-particle-display);
-  border-color: var(--color-pos-particle-display);
-  border-radius: 999px; /* Pill/capsule */
+  color: var(--token-pos-particle);
+  background-color: var(--token-pos-particle-bg);
+  border-color: var(--token-pos-particle);
+  border-radius: var(--comp-badge-radius-particle);
 }
 
+/* Diamond shape: rotate the box, counter-rotate the text */
 .pos-badge--special {
-  color: var(--color-pos-special-display);
-  border-color: var(--color-pos-special-display);
-  border-radius: 2px;
-  transform: rotate(45deg);
-  width: 1.25rem;
-  height: 1.25rem;
+  color: var(--token-pos-special);
+  background-color: var(--token-pos-special-bg);
+  border-color: var(--token-pos-special);
+  border-radius: var(--comp-badge-radius-special);
+  width: 1.375rem;
+  height: 1.375rem;
   padding: 0;
+  transform: rotate(45deg);
+}
+
+.pos-badge--special > span {
+  transform: rotate(-45deg);
+  display: inline-flex;
 }
 
 .pos-badge--phrase {
-  color: var(--color-pos-phrase-display);
-  border-color: var(--color-pos-phrase-display);
-  border-radius: 4px;
+  color: var(--token-pos-phrase);
+  background-color: var(--token-pos-phrase-bg);
+  border-color: var(--token-pos-phrase);
+  border-radius: var(--comp-badge-radius-phrase);
   border-style: dashed;
 }
 
 .pos-badge--hidden {
-  color: var(--color-pos-hidden-display);
-  border-color: var(--color-pos-hidden-display);
-  border-radius: 4px;
+  color: var(--token-pos-hidden);
+  background-color: var(--token-pos-hidden-bg);
+  border-color: var(--token-pos-hidden);
+  border-radius: var(--comp-badge-radius-hidden);
   border-style: dotted;
 }

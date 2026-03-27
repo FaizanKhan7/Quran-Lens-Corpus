@@ -1,0 +1,182 @@
+/*
+ * PRIMITIVE TOKENS
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Raw, context-free values. No meaning. Never consumed by components directly.
+ * Semantic tokens reference these; components reference semantic tokens.
+ *
+ * Naming: --primitive-{scale}-{step}
+ */
+
+:root {
+  /* ── Color Palette ─────────────────────────────────────────────────────── */
+
+  /* Neutral */
+  --primitive-neutral-0:    #ffffff;
+  --primitive-neutral-50:   #f8f9fa;
+  --primitive-neutral-100:  #f1f3f5;
+  --primitive-neutral-200:  #e9ecef;
+  --primitive-neutral-300:  #dee2e6;
+  --primitive-neutral-400:  #ced4da;
+  --primitive-neutral-500:  #adb5bd;
+  --primitive-neutral-600:  #6c757d;
+  --primitive-neutral-700:  #495057;
+  --primitive-neutral-800:  #343a40;
+  --primitive-neutral-900:  #212529;
+  --primitive-neutral-950:  #0a0a0a;
+  --primitive-neutral-1000: #000000;
+
+  /* Cool Gray (for borders, muted text) */
+  --primitive-gray-100: #f8f9fa;
+  --primitive-gray-200: #e2e8f0;
+  --primitive-gray-300: #cbd5e0;
+  --primitive-gray-400: #a0aec0;
+  --primitive-gray-500: #718096;
+  --primitive-gray-600: #4a5568;
+  --primitive-gray-700: #2d3748;
+  --primitive-gray-800: #1a202c;
+  --primitive-gray-900: #141414;
+  --primitive-gray-950: #0a0a0a;
+
+  /* Green (Nominal POS) */
+  --primitive-green-50:  #f1f8e9;
+  --primitive-green-100: #dcedc8;
+  --primitive-green-200: #c5e1a5;
+  --primitive-green-300: #a5d6a7;
+  --primitive-green-400: #81c784;
+  --primitive-green-500: #66bb6a;
+  --primitive-green-600: #4caf50;
+  --primitive-green-700: #388e3c;
+  --primitive-green-800: #2e7d32;
+  --primitive-green-900: #1b5e20;
+
+  /* Blue (Verbal POS) */
+  --primitive-blue-50:  #e3f2fd;
+  --primitive-blue-100: #bbdefb;
+  --primitive-blue-200: #90caf9;
+  --primitive-blue-300: #64b5f6;
+  --primitive-blue-400: #42a5f5;
+  --primitive-blue-500: #2196f3;
+  --primitive-blue-600: #1e88e5;
+  --primitive-blue-700: #1976d2;
+  --primitive-blue-800: #1565c0;
+  --primitive-blue-900: #0d47a1;
+
+  /* Red (Particle POS) */
+  --primitive-red-50:  #ffebee;
+  --primitive-red-100: #ffcdd2;
+  --primitive-red-200: #ef9a9a;
+  --primitive-red-300: #e57373;
+  --primitive-red-400: #ef5350;
+  --primitive-red-500: #f44336;
+  --primitive-red-600: #e53935;
+  --primitive-red-700: #d32f2f;
+  --primitive-red-800: #c62828;
+  --primitive-red-900: #b71c1c;
+
+  /* Purple (Special/INL POS) */
+  --primitive-purple-50:  #f3e5f5;
+  --primitive-purple-100: #e1bee7;
+  --primitive-purple-200: #ce93d8;
+  --primitive-purple-300: #ba68c8;
+  --primitive-purple-400: #ab47bc;
+  --primitive-purple-500: #9c27b0;
+  --primitive-purple-600: #8e24aa;
+  --primitive-purple-700: #7b1fa2;
+  --primitive-purple-800: #6a1b9a;
+  --primitive-purple-900: #4a148c;
+
+  /* Slate (Phrase nodes) */
+  --primitive-slate-50:  #eceff1;
+  --primitive-slate-100: #cfd8dc;
+  --primitive-slate-200: #b0bec5;
+  --primitive-slate-300: #90a4ae;
+  --primitive-slate-400: #78909c;
+  --primitive-slate-500: #607d8b;
+  --primitive-slate-600: #546e7a;
+  --primitive-slate-700: #455a64;
+  --primitive-slate-800: #37474f;
+  --primitive-slate-900: #263238;
+
+  /* ── Spacing Scale (base-8) ────────────────────────────────────────────── */
+
+  --primitive-space-1:   0.0625rem;  /*  1px */
+  --primitive-space-2:   0.125rem;   /*  2px */
+  --primitive-space-4:   0.25rem;    /*  4px */
+  --primitive-space-6:   0.375rem;   /*  6px */
+  --primitive-space-8:   0.5rem;     /*  8px */
+  --primitive-space-12:  0.75rem;    /* 12px */
+  --primitive-space-16:  1rem;       /* 16px */
+  --primitive-space-24:  1.5rem;     /* 24px */
+  --primitive-space-32:  2rem;       /* 32px */
+  --primitive-space-48:  3rem;       /* 48px */
+  --primitive-space-64:  4rem;       /* 64px */
+  --primitive-space-80:  5rem;       /* 80px */
+  --primitive-space-96:  6rem;       /* 96px */
+  --primitive-space-128: 8rem;       /* 128px */
+
+  /* ── Font Size Scale ───────────────────────────────────────────────────── */
+
+  --primitive-text-10: 0.625rem;   /* 10px */
+  --primitive-text-11: 0.6875rem;  /* 11px */
+  --primitive-text-12: 0.75rem;    /* 12px */
+  --primitive-text-14: 0.875rem;   /* 14px */
+  --primitive-text-16: 1rem;       /* 16px */
+  --primitive-text-18: 1.125rem;   /* 18px */
+  --primitive-text-20: 1.25rem;    /* 20px */
+  --primitive-text-24: 1.5rem;     /* 24px */
+  --primitive-text-28: 1.75rem;    /* 28px */
+  --primitive-text-32: 2rem;       /* 32px */
+  --primitive-text-40: 2.5rem;     /* 40px */
+  --primitive-text-48: 3rem;       /* 48px */
+
+  /* ── Line Height Scale ─────────────────────────────────────────────────── */
+
+  --primitive-leading-tight:   1.2;
+  --primitive-leading-snug:    1.375;
+  --primitive-leading-normal:  1.5;
+  --primitive-leading-relaxed: 1.6;
+  --primitive-leading-loose:   1.7;
+  --primitive-leading-arabic:  1.8;
+
+  /* ── Font Weight Scale ─────────────────────────────────────────────────── */
+
+  --primitive-weight-regular:   400;
+  --primitive-weight-medium:    500;
+  --primitive-weight-semibold:  600;
+  --primitive-weight-bold:      700;
+
+  /* ── Border Radius Scale ───────────────────────────────────────────────── */
+
+  --primitive-radius-1:    0.0625rem;  /*  1px */
+  --primitive-radius-2:    0.125rem;   /*  2px */
+  --primitive-radius-4:    0.25rem;    /*  4px */
+  --primitive-radius-8:    0.5rem;     /*  8px */
+  --primitive-radius-12:   0.75rem;    /* 12px */
+  --primitive-radius-16:   1rem;       /* 16px */
+  --primitive-radius-full: 9999px;
+
+  /* ── Motion ────────────────────────────────────────────────────────────── */
+
+  --primitive-duration-instant: 0ms;
+  --primitive-duration-fast:    100ms;
+  --primitive-duration-base:    150ms;
+  --primitive-duration-slow:    200ms;
+  --primitive-duration-slower:  300ms;
+
+  --primitive-ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --primitive-ease-in:      cubic-bezier(0.4, 0, 1, 1);
+  --primitive-ease-out:     cubic-bezier(0, 0, 0.2, 1);
+
+  /* ── Elevation (box-shadow) ────────────────────────────────────────────── */
+
+  --primitive-shadow-1: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --primitive-shadow-2: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --primitive-shadow-3: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --primitive-shadow-4: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* ── Layout ────────────────────────────────────────────────────────────── */
+
+  --primitive-max-width-content: 60rem;   /* 960px */
+  --primitive-max-width-prose:   42rem;   /* 672px */
+  --primitive-max-width-narrow:  28rem;   /* 448px */
+}
