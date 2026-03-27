@@ -1,65 +1,153 @@
-import Image from "next/image";
+import Link from "next/link";
+import { BottomNav } from "@/components/layout/BottomNav";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <>
+      <main
+        className="flex-1 flex flex-col items-center justify-center px-4 pb-16 md:pb-0"
+        dir="rtl"
+      >
+        <div className="w-full max-w-[var(--max-content-width)] mx-auto">
+          {/* Hero */}
+          <section className="text-center py-16 md:py-24" aria-labelledby="hero-heading">
+            <p
+              className="arabic verse-arabic text-[var(--color-fg-muted)] mb-4"
+              lang="ar"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+            </p>
+            <h1
+              id="hero-heading"
+              className="latin text-3xl md:text-5xl font-bold text-[var(--color-fg)] mb-4"
+              dir="ltr"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+              Quran Lens
+            </h1>
+            <p
+              className="latin text-[var(--color-fg-muted)] text-lg max-w-xl mx-auto mb-10"
+              dir="ltr"
+            >
+              Explore every word of the Quran — morphology, roots, grammar, and
+              syntactic structure. Tap any word to understand it.
+            </p>
+
+            <div className="flex justify-center" dir="ltr">
+              <Link
+                href="/search"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full
+                  bg-[var(--color-pos-verbal)] text-white font-semibold text-base
+                  hover:opacity-90 transition-opacity min-h-[3rem]"
+                aria-label="Go to search"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-5 h-5"
+                  aria-hidden="true"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+                Search a word or root
+              </Link>
+            </div>
+          </section>
+
+          {/* Design Token Preview — Phase 1 visual verification */}
+          <section
+            className="border border-[var(--color-border-base)] rounded-xl p-6 mb-8"
+            aria-labelledby="design-tokens-heading"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <h2
+              id="design-tokens-heading"
+              className="latin text-sm font-semibold text-[var(--color-fg-subtle)] mb-4 uppercase tracking-widest"
+              dir="ltr"
+            >
+              POS Color System (Triple Encoding — spec §8.3)
+            </h2>
+            <div className="flex flex-wrap gap-3 justify-center" dir="ltr">
+              <span className="pos-badge pos-badge--nominal">N</span>
+              <span className="pos-badge pos-badge--nominal">PN</span>
+              <span className="pos-badge pos-badge--nominal">ADJ</span>
+              <span className="pos-badge pos-badge--verbal">V</span>
+              <span className="pos-badge pos-badge--particle">P</span>
+              <span className="pos-badge pos-badge--particle">CONJ</span>
+              <span className="pos-badge pos-badge--particle">NEG</span>
+              <span className="pos-badge pos-badge--special">INL</span>
+              <span className="pos-badge pos-badge--phrase">NS</span>
+              <span className="pos-badge pos-badge--hidden">(*)</span>
+            </div>
+          </section>
+
+          {/* Quick-browse Surah grid stub */}
+          <section aria-labelledby="browse-heading">
+            <h2
+              id="browse-heading"
+              className="latin text-lg font-semibold text-[var(--color-fg)] mb-4"
+              dir="ltr"
+            >
+              Browse Surahs
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {SAMPLE_SURAHS.map((surah) => (
+                <Link
+                  key={surah.id}
+                  href={`/surah/${surah.id}`}
+                  className="flex flex-col items-center gap-1 p-4 rounded-lg
+                    border border-[var(--color-border-base)]
+                    bg-[var(--color-bg-raised)]
+                    hover:border-[var(--color-pos-verbal-display)]
+                    transition-colors min-h-[3rem]"
+                >
+                  <span
+                    className="latin text-xs text-[var(--color-fg-muted)]"
+                    dir="ltr"
+                  >
+                    {surah.id}
+                  </span>
+                  <span className="arabic text-base" lang="ar">
+                    {surah.nameArabic}
+                  </span>
+                  <span
+                    className="latin text-xs text-[var(--color-fg-subtle)]"
+                    dir="ltr"
+                  >
+                    {surah.nameSimple}
+                  </span>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-4 text-center" dir="ltr">
+              <Link
+                href="/surah"
+                className="inline-link latin text-sm text-[var(--color-pos-verbal-display)] hover:underline"
+              >
+                View all 114 surahs →
+              </Link>
+            </div>
+          </section>
         </div>
       </main>
-    </div>
+
+      <BottomNav />
+    </>
   );
 }
+
+// Stub data — replaced by API in Phase 1 Step 4
+const SAMPLE_SURAHS = [
+  { id: 1, nameArabic: "ٱلْفَاتِحَة", nameSimple: "Al-Fatihah" },
+  { id: 2, nameArabic: "ٱلْبَقَرَة", nameSimple: "Al-Baqarah" },
+  { id: 3, nameArabic: "آلِ عِمْرَان", nameSimple: "Ali 'Imran" },
+  { id: 4, nameArabic: "ٱلنِّسَاء", nameSimple: "An-Nisa" },
+  { id: 18, nameArabic: "ٱلْكَهْف", nameSimple: "Al-Kahf" },
+  { id: 36, nameArabic: "يس", nameSimple: "Ya-Sin" },
+  { id: 55, nameArabic: "ٱلرَّحْمَـٰن", nameSimple: "Ar-Rahman" },
+  { id: 112, nameArabic: "ٱلْإِخْلَاص", nameSimple: "Al-Ikhlas" },
+] as const;
