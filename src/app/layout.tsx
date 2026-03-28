@@ -3,19 +3,32 @@ import { Inter } from "next/font/google";
 import { Amiri } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { FontWatcher } from "@/components/providers/FontWatcher";
 import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 });
 
+// Amiri: the critical Arabic font for all Quranic text (spec §8.4).
+// Rules:
+//   - weight 400 only — we NEVER bold Arabic (spec §8.4)
+//   - display "swap" — show fallback immediately; swap when Amiri loads (FOUT > blank text)
+//   - adjustFontFallback: true — next/font injects size-adjust on the fallback serif
+//     so glyphs are the same cap-height → near-zero CLS when the real font arrives
+//   - fallback: ["serif"] — tells next/font which system font to size-adjust against
 const amiri = Amiri({
   variable: "--font-amiri",
   subsets: ["arabic", "latin"],
-  weight: ["400", "700"],
+  weight: ["400"],
   display: "swap",
+  preload: true,
+  adjustFontFallback: true,
+  fallback: ["serif"],
 });
 
 export const metadata: Metadata = {
@@ -60,7 +73,10 @@ export default function RootLayout({
       className={`${inter.variable} ${amiri.variable} ${GeistMono.variable} h-full antialiased`}
     >
       <body className="min-h-dvh flex flex-col bg-[var(--color-bg)] text-[var(--color-fg)]">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <FontWatcher />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

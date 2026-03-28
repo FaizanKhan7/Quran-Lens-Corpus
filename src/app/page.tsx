@@ -1,8 +1,23 @@
 import Link from "next/link";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { POSBadge, PhraseBadge, HiddenNodeBadge } from "@/components/ui/POSBadge";
+import { getAllSurahs } from "@/lib/surah-data";
 
-export default function HomePage() {
+// Show this many surahs in the home page quick-browse grid
+const HOME_PREVIEW_IDS = [1, 2, 3, 4, 18, 36, 55, 112];
+
+export default async function HomePage() {
+  // Fetch live data; fall back to empty array so build still works without DB
+  let allSurahs: Awaited<ReturnType<typeof getAllSurahs>> = [];
+  try {
+    allSurahs = await getAllSurahs();
+  } catch {
+    // DB not available — home page still renders, grid shows nothing
+  }
+  const previewSurahs = HOME_PREVIEW_IDS
+    .map((id) => allSurahs.find((s) => s.id === id))
+    .filter(Boolean) as typeof allSurahs;
+
   return (
     <>
       <main
@@ -104,7 +119,7 @@ export default function HomePage() {
               Browse Surahs
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-word-gap">
-              {SAMPLE_SURAHS.map((surah) => (
+              {previewSurahs.map((surah) => (
                 <Link
                   key={surah.id}
                   href={`/surah/${surah.id}`}
@@ -142,13 +157,3 @@ export default function HomePage() {
   );
 }
 
-const SAMPLE_SURAHS = [
-  { id: 1,   nameArabic: "ٱلْفَاتِحَة",  nameSimple: "Al-Fatihah" },
-  { id: 2,   nameArabic: "ٱلْبَقَرَة",   nameSimple: "Al-Baqarah" },
-  { id: 3,   nameArabic: "آلِ عِمْرَان", nameSimple: "Ali 'Imran" },
-  { id: 4,   nameArabic: "ٱلنِّسَاء",   nameSimple: "An-Nisa" },
-  { id: 18,  nameArabic: "ٱلْكَهْف",    nameSimple: "Al-Kahf" },
-  { id: 36,  nameArabic: "يس",          nameSimple: "Ya-Sin" },
-  { id: 55,  nameArabic: "ٱلرَّحْمَـٰن", nameSimple: "Ar-Rahman" },
-  { id: 112, nameArabic: "ٱلْإِخْلَاص", nameSimple: "Al-Ikhlas" },
-] as const;

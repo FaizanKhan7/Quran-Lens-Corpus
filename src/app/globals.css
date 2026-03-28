@@ -136,6 +136,29 @@ body {
   direction: rtl;
   font-weight: var(--primitive-weight-regular); /* Never bold on Arabic — spec §8.4 */
   font-style: normal;                           /* Never italic on Arabic — spec §8.4 */
+
+  /* ── OpenType features for proper Arabic shaping ───────────────────────
+   *  liga  — standard ligatures  (mandatory for Arabic glyph joining)
+   *  calt  — contextual alternates (correct form per neighbouring glyphs)
+   *  kern  — kerning pairs
+   *  mark  — mark-to-base positioning (harakat / diacritics on stems)
+   *  mkmk  — mark-to-mark positioning (stacked diacritics, e.g. shadda+kasra)
+   * ─────────────────────────────────────────────────────────────────────── */
+  font-feature-settings: "liga" 1, "calt" 1, "kern" 1, "mark" 1, "mkmk" 1;
+  font-variant-ligatures: common-ligatures;
+
+  /* Rendering quality */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Spacing — must be normal/0 for Arabic; tracking breaks glyph joining */
+  letter-spacing: normal;
+  word-spacing: normal;
+
+  /* Arabic never hyphenates */
+  hyphens: none;
+  overflow-wrap: break-word; /* prevent overflow from very long un-spaced words */
 }
 
 /* Latin within RTL context */
@@ -143,6 +166,30 @@ body {
 .latin {
   direction: ltr;
   font-family: var(--token-font-latin);
+}
+
+/* ─── Font-swap smoothing (FOUT mitigation) ──────────────────────────────── */
+/*
+ * While Amiri is still loading (fallback serif showing), Arabic text renders
+ * at 0.92 opacity so the fallback's different glyph shapes are less jarring.
+ *
+ * FontWatcher adds data-fonts-loaded="true" to <html> once document.fonts is
+ * ready. The transition to opacity:1 runs once at 200ms, smoothing the swap.
+ *
+ * Progressive-enhancement safe: if JS is disabled the text stays at 0.92
+ * (barely noticeable) and there is no blank or invisible Arabic text.
+ */
+[lang="ar"],
+.arabic,
+.verse-arabic {
+  opacity: 0.92;
+  transition: opacity 200ms var(--token-motion-easing);
+}
+
+[data-fonts-loaded="true"] [lang="ar"],
+[data-fonts-loaded="true"] .arabic,
+[data-fonts-loaded="true"] .verse-arabic {
+  opacity: 1;
 }
 
 /* ─── Focus Styles (WCAG 2.2 AA — spec §14.1) ────────────────────────────── */
@@ -205,15 +252,23 @@ a.inline-link {
 
 /*
  * Verse-level Arabic text
- * Usage: <p className="verse-arabic">بِسْمِ ٱللَّهِ</p>
+ * Usage: <p className="verse-arabic">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
+ *
+ * Line-height 2.0 (not 1.7) — full Quranic tashkeel stacks harakat above AND
+ * below the baseline simultaneously. At lg/xl sizes this requires extra room or
+ * the top diacritics are clipped. 2.0 provides safe clearance at 24-32px sizes.
+ * word-spacing 0.05em — slight gap makes long verses easier to scan without
+ * visually detaching the connected script.
  */
 .verse-arabic {
   font-family: var(--token-font-arabic);
   font-size: var(--token-font-size-arabic-lg);
-  line-height: var(--token-leading-arabic);
+  line-height: 2;
   direction: rtl;
   font-weight: var(--primitive-weight-regular);
   font-style: normal;
+  word-spacing: 0.05em;
+  /* Inherit OpenType features from [lang="ar"] rule */
 }
 
 /*
@@ -301,4 +356,560 @@ a.inline-link {
   border-color: var(--token-pos-hidden);
   border-radius: var(--comp-badge-radius-hidden);
   border-style: dotted;
+}
+
+/*
+ * WordCard — Tier 1 & 2 progressive disclosure (spec §10.1)
+ *
+ * Tier 1: Always-visible Arabic word, gloss, and POS badge.
+ * Tier 2: Expanded detail region (root, lemma, features).
+ *
+ * Key UX rules:
+ *   - Full bar is the clickable trigger (entire .word-card__trigger)
+ *   - No auto-scroll on expand
+ *   - No auto-collapse of siblings (state is local)
+ */
+
+.word-card {
+  background-color: var(--comp-word-card-bg);
+  border: 1px solid var(--comp-word-card-border);
+  border-radius: var(--comp-word-card-radius);
+  box-shadow: var(--comp-word-card-shadow);
+  transition: box-shadow var(--comp-word-card-transition),
+              background-color var(--comp-word-card-transition);
+  overflow: hidden;
+}
+
+.word-card--expanded {
+  box-shadow: var(--comp-word-card-shadow-hover);
+  background-color: var(--comp-word-card-bg-hover);
+}
+
+/* Full-bar trigger — entire card top is tappable */
+.word-card__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-space-8);
+  width: 100%;
+  padding: var(--comp-word-card-padding);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: start;
+  min-height: var(--token-space-touch-min); /* 48px touch target */
+  /* Override base button min-width enforcement */
+  min-width: 0;
+  transition: background-color var(--comp-word-card-transition);
+}
+
+.word-card__trigger:hover {
+  background-color: var(--token-interactive-hover-bg);
+}
+
+.word-card__trigger:active {
+  background-color: var(--token-interactive-active-bg);
+}
+
+/* Arabic word — display at body Arabic size */
+.word-card__arabic {
+  font-size: var(--comp-word-card-arabic-size);
+  flex-shrink: 0;
+  margin-inline-start: auto; /* Push to right side in RTL context */
+}
+
+/* English gloss */
+.word-card__gloss {
+  font-size: var(--comp-word-card-gloss-size);
+  color: var(--comp-word-card-gloss-color);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* POS badge positioned after gloss */
+.word-card__pos-badge {
+  flex-shrink: 0;
+}
+
+/* Expand/collapse chevron */
+.word-card__chevron {
+  flex-shrink: 0;
+  color: var(--token-text-tertiary);
+  font-size: var(--token-font-size-latin-md);
+  transition: transform var(--comp-word-card-transition);
+  line-height: 1;
+  transform: rotate(90deg); /* › points down when collapsed */
+}
+
+.word-card__chevron--open {
+  transform: rotate(270deg); /* › points up when expanded */
+}
+
+/* Tier 2 detail region */
+.word-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-space-6);
+  padding: 0 var(--comp-word-card-padding) var(--comp-word-card-padding);
+  border-top: 1px solid var(--token-border-subtle);
+  padding-top: var(--primitive-space-12);
+}
+
+/* Segment breakdown row */
+.word-card__segments {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--primitive-space-4);
+}
+
+/*
+ * VerseWordGrid — RTL responsive word-by-word grid (spec §10.2 / §15.1)
+ *
+ * Words flow right → left (Arabic reading order).
+ * Each cell is at least 120px wide; cards expand to fill available space.
+ * On mobile the grid collapses to a single column for full-width cards.
+ */
+
+.verse-word-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--token-space-word-gap);
+  direction: rtl;
+}
+
+@media (max-width: 480px) {
+  .verse-word-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*
+ * VerseAccordion — spec §10.2
+ *
+ * UX rules enforced in CSS:
+ *   - Full bar is tappable (trigger covers 100% width)
+ *   - Min touch target 48px
+ *   - Arabic text dominant, word count + link right-aligned
+ *   - Chevron rotates on expand (no layout shift)
+ */
+
+.verse-accordion {
+  background-color: var(--comp-word-card-bg);
+  border: 1px solid var(--comp-verse-border);
+  border-radius: var(--comp-verse-radius);
+  overflow: hidden;
+  transition: box-shadow var(--comp-word-card-transition);
+}
+
+.verse-accordion--expanded {
+  box-shadow: var(--token-shadow-raised);
+}
+
+/* Full-width clickable trigger */
+.verse-accordion__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-space-8);
+  width: 100%;
+  padding: var(--comp-verse-padding-y) var(--comp-verse-padding-x);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: start;
+  min-height: var(--token-space-touch-min); /* 48px */
+  min-width: 0;
+  transition: background-color var(--comp-word-card-transition);
+}
+
+.verse-accordion__trigger:hover {
+  background-color: var(--token-interactive-hover-bg);
+}
+
+.verse-accordion__trigger:active {
+  background-color: var(--token-interactive-active-bg);
+}
+
+/* Verse number badge */
+.verse-accordion__number {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 var(--primitive-space-4);
+  font-size: var(--comp-verse-number-size);
+  color: var(--comp-verse-number-color);
+  border: 1px solid var(--token-border-subtle);
+  border-radius: var(--primitive-radius-full);
+  font-family: var(--token-font-latin);
+  line-height: 1;
+}
+
+/* Arabic verse text — occupies most of the row */
+.verse-accordion__arabic {
+  flex: 1;
+  font-size: var(--token-font-size-arabic-md);
+  line-height: var(--token-leading-arabic);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+/* Word count + link group */
+.verse-accordion__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-space-6);
+  flex-shrink: 0;
+}
+
+.verse-accordion__word-count {
+  font-size: var(--token-font-size-latin-xs);
+  color: var(--token-text-tertiary);
+}
+
+.verse-accordion__detail-link {
+  font-size: var(--token-font-size-latin-sm);
+  color: var(--token-pos-verbal);
+  padding: var(--primitive-space-2) var(--primitive-space-4);
+  border-radius: var(--primitive-radius-4);
+  transition: background-color var(--token-motion-fast);
+  min-height: unset;
+  min-width: unset;
+}
+
+.verse-accordion__detail-link:hover {
+  background-color: var(--token-pos-verbal-bg);
+}
+
+/* Chevron */
+.verse-accordion__chevron {
+  flex-shrink: 0;
+  color: var(--token-text-tertiary);
+  font-size: var(--token-font-size-latin-md);
+  transition: transform var(--comp-word-card-transition);
+  line-height: 1;
+  transform: rotate(90deg);
+}
+
+.verse-accordion__chevron--open {
+  transform: rotate(270deg);
+}
+
+/* Expanded body */
+.verse-accordion__body {
+  padding: var(--primitive-space-12) var(--comp-verse-padding-x) var(--comp-verse-padding-x);
+  border-top: 1px solid var(--token-border-subtle);
+}
+
+/* Loading skeleton */
+.verse-accordion__skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--token-space-word-gap);
+}
+
+.skeleton-word-card {
+  height: 3.5rem;
+  border-radius: var(--comp-word-card-radius);
+  background: linear-gradient(
+    90deg,
+    var(--token-surface-overlay) 25%,
+    var(--token-surface-sunken)  50%,
+    var(--token-surface-overlay) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Generic single-line skeleton (for breadcrumbs, text lines, etc.) */
+.skeleton-line {
+  height: 1rem;
+  border-radius: var(--primitive-radius-4);
+  background: linear-gradient(
+    90deg,
+    var(--token-surface-overlay) 25%,
+    var(--token-surface-sunken)  50%,
+    var(--token-surface-overlay) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+/* Error state */
+.verse-accordion__error {
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-space-8);
+  color: var(--token-pos-particle);
+  font-size: var(--token-font-size-latin-sm);
+}
+
+.verse-accordion__retry {
+  font-size: var(--token-font-size-latin-xs);
+  color: var(--token-pos-verbal);
+  border: 1px solid var(--token-pos-verbal-ring);
+  border-radius: var(--primitive-radius-4);
+  padding: var(--primitive-space-2) var(--primitive-space-8);
+  background: none;
+  cursor: pointer;
+  min-height: unset;
+  min-width: unset;
+  transition: background-color var(--token-motion-fast);
+}
+
+.verse-accordion__retry:hover {
+  background-color: var(--token-pos-verbal-bg);
+}
+
+/*
+ * SurahGrid + SurahCard — spec §9.1 Level 1: 114 surahs listing
+ *
+ * Grid: responsive, 2 cols mobile → 4 cols desktop
+ * Card: number badge (top-left), Arabic name, Latin name, meta row
+ */
+
+.surah-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--token-space-word-gap);
+}
+
+@media (min-width: 480px) {
+  .surah-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .surah-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .surah-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.surah-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--primitive-space-4);
+  padding: var(--token-space-card-padding);
+  background-color: var(--token-surface-raised);
+  border: 1px solid var(--token-border-subtle);
+  border-radius: var(--primitive-radius-8);
+  text-decoration: none;
+  transition: border-color var(--token-motion-fast) var(--token-motion-easing),
+              background-color var(--token-motion-fast) var(--token-motion-easing),
+              box-shadow var(--token-motion-fast) var(--token-motion-easing);
+  /* Override global touch-target for card links */
+  min-height: var(--token-space-touch-min);
+  min-width: 0;
+}
+
+.surah-card:hover {
+  border-color: var(--token-pos-verbal);
+  background-color: var(--token-surface-overlay);
+  box-shadow: var(--token-shadow-card);
+}
+
+.surah-card:focus-visible {
+  outline-offset: 2px;
+}
+
+/* Surah number — small, tertiary, top of card */
+.surah-card__number {
+  font-size: var(--token-font-size-latin-xs);
+  color: var(--token-text-tertiary);
+  line-height: 1;
+}
+
+/* Arabic name */
+.surah-card__arabic {
+  font-size: var(--token-font-size-arabic-md);
+  line-height: var(--token-leading-arabic);
+  color: var(--token-text-primary);
+  text-align: center;
+}
+
+/* Latin name */
+.surah-card__latin {
+  font-size: var(--token-font-size-latin-sm);
+  color: var(--token-text-secondary);
+  text-align: center;
+}
+
+/* Meta row: verse count + revelation badge */
+.surah-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-space-4);
+  font-size: var(--token-font-size-latin-xs);
+  color: var(--token-text-tertiary);
+  margin-top: auto;
+}
+
+/* Mak. / Mad. badge */
+.surah-card__badge {
+  font-size: var(--token-font-size-latin-xs);
+  padding: 1px var(--primitive-space-4);
+  border-radius: var(--primitive-radius-full);
+  border: 1px solid currentColor;
+  line-height: 1.4;
+}
+
+.surah-card__badge[data-place="makkah"] {
+  color: var(--token-pos-particle);
+  background-color: var(--token-pos-particle-bg);
+  border-color: var(--token-pos-particle);
+}
+
+.surah-card__badge[data-place="madinah"] {
+  color: var(--token-pos-verbal);
+  background-color: var(--token-pos-verbal-bg);
+  border-color: var(--token-pos-verbal);
+}
+
+/*
+ * JumpToVerse — inline form for navigating directly to a verse (spec §11 F10)
+ */
+
+.jump-to-verse {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-space-6);
+}
+
+.jump-to-verse__label {
+  font-size: var(--token-font-size-latin-sm);
+  color: var(--token-text-secondary);
+  font-weight: 500;
+}
+
+.jump-to-verse__controls {
+  display: flex;
+  gap: var(--primitive-space-6);
+  align-items: center;
+}
+
+.jump-to-verse__input {
+  width: 5rem;
+  padding: var(--primitive-space-6) var(--primitive-space-8);
+  background-color: var(--token-surface-base);
+  border: 1px solid var(--token-border-base);
+  border-radius: var(--primitive-radius-4);
+  font-family: var(--token-font-latin);
+  font-size: var(--token-font-size-latin-sm);
+  color: var(--token-text-primary);
+  line-height: 1;
+  min-height: var(--token-space-touch-min);
+  min-width: 0;
+  transition: border-color var(--token-motion-fast);
+}
+
+.jump-to-verse__input:focus {
+  outline: none;
+  border-color: var(--token-pos-verbal);
+}
+
+.jump-to-verse__input[aria-invalid="true"] {
+  border-color: var(--token-pos-particle);
+}
+
+/* Remove number input spin buttons */
+.jump-to-verse__input::-webkit-inner-spin-button,
+.jump-to-verse__input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.jump-to-verse__btn {
+  padding: 0 var(--primitive-space-16);
+  background-color: var(--token-pos-verbal);
+  color: var(--token-text-on-accent);
+  border: none;
+  border-radius: var(--primitive-radius-4);
+  font-family: var(--token-font-latin);
+  font-size: var(--token-font-size-latin-sm);
+  font-weight: 500;
+  cursor: pointer;
+  min-height: var(--token-space-touch-min);
+  min-width: unset;
+  transition: opacity var(--token-motion-fast);
+}
+
+.jump-to-verse__btn:hover {
+  opacity: 0.85;
+}
+
+.jump-to-verse__error {
+  font-size: var(--token-font-size-latin-xs);
+  color: var(--token-pos-particle);
+  margin: 0;
+}
+
+/*
+ * Surah prev/next navigation (used at bottom of /surah/[id] page)
+ */
+
+.surah-nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--primitive-space-8);
+  padding-top: var(--primitive-space-24);
+  margin-top: var(--primitive-space-24);
+  border-top: 1px solid var(--token-border-subtle);
+}
+
+.surah-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitive-space-4);
+  font-size: var(--token-font-size-latin-sm);
+  color: var(--token-pos-verbal);
+  padding: var(--primitive-space-6) var(--primitive-space-12);
+  border: 1px solid var(--token-pos-verbal-ring);
+  border-radius: var(--primitive-radius-4);
+  text-decoration: none;
+  transition: background-color var(--token-motion-fast) var(--token-motion-easing);
+  min-height: var(--token-space-touch-min);
+  min-width: unset;
+}
+
+.surah-nav-btn:hover {
+  background-color: var(--token-pos-verbal-bg);
+}
+
+/* Verse prev/next navigation buttons */
+.verse-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--token-font-size-latin-sm);
+  color: var(--token-pos-verbal);
+  padding: var(--primitive-space-6) var(--primitive-space-12);
+  border: 1px solid var(--token-pos-verbal-ring);
+  border-radius: var(--primitive-radius-4);
+  transition: background-color var(--token-motion-fast) var(--token-motion-easing);
+  min-height: var(--token-space-touch-min);
+  min-width: unset;
+}
+
+.verse-nav-btn:hover {
+  background-color: var(--token-pos-verbal-bg);
 }

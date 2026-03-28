@@ -19,7 +19,11 @@
  *         --dry-run         parse only, no DB writes
  */
 
-import { PrismaClient, RevelationPlace, SegmentType } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+
+// Prisma enum values (string literals matching the schema enums)
+type RevelationPlace = "makkah" | "madinah";
+const SegmentType = { PREFIX: "PREFIX", STEM: "STEM", SUFFIX: "SUFFIX" } as const;
 import { PrismaPg } from "@prisma/adapter-pg";
 import * as fs from "fs";
 import * as path from "path";
@@ -152,7 +156,7 @@ async function seedWords(parsed: ParseResult) {
 
 // ─── Step 5: Seed segments ────────────────────────────────────────────────────
 
-function segmentTypeEnum(t: string): SegmentType {
+function segmentTypeEnum(t: string): typeof SegmentType[keyof typeof SegmentType] {
   if (t === "PREFIX") return SegmentType.PREFIX;
   if (t === "SUFFIX") return SegmentType.SUFFIX;
   return SegmentType.STEM;
@@ -197,7 +201,7 @@ async function seedSegments(segments: CorpusSegment[]) {
 async function seedRoots(parsed: ParseResult): Promise<Map<string, number>> {
   // Count word-level frequency per root (number of DISTINCT words using each root)
   const rootWordCount = new Map<string, Set<string>>();
-  for (const [bw, arabic] of parsed.roots) {
+  for (const [bw] of parsed.roots) {
     rootWordCount.set(bw, new Set());
   }
   for (const seg of parsed.segments) {
@@ -324,9 +328,9 @@ async function updateFrequencies() {
   await prisma.$executeRaw`
     UPDATE roots r
     SET frequency = (
-      SELECT COUNT(DISTINCT wr.word_id)
+      SELECT COUNT(DISTINCT wr."wordId")
       FROM word_roots wr
-      WHERE wr.root_id = r.id
+      WHERE wr."rootId" = r.id
     )
   `;
 
@@ -334,9 +338,9 @@ async function updateFrequencies() {
   await prisma.$executeRaw`
     UPDATE lemmas l
     SET frequency = (
-      SELECT COUNT(DISTINCT wl.word_id)
+      SELECT COUNT(DISTINCT wl."wordId")
       FROM word_lemmas wl
-      WHERE wl.lemma_id = l.id
+      WHERE wl."lemmaId" = l.id
     )
   `;
   log("  ✓ Frequencies updated.");
@@ -355,7 +359,7 @@ async function main() {
   }
 
   // Verify corpus files exist
-  for (const [label, fp] of [["morphology.txt", CORPUS_FILE], ["quran-uthmani.xml", XML_FILE]] as const) {
+  for (const [, fp] of [["morphology.txt", CORPUS_FILE], ["quran-uthmani.xml", XML_FILE]] as const) {
     if (!fs.existsSync(fp)) {
       console.error(`\nCorpus file not found: ${fp}\n\nRun first:  npm run corpus:download\n`);
       process.exit(1);
