@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# corpus data (large binary — download via npm run corpus:download)
+data/corpus/
+
+# prisma generated (regenerate via npm run db:generate)
+node_modules/.prisma/

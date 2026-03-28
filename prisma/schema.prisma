@@ -1,0 +1,267 @@
+// ─── Prisma Schema — Quran Lens Corpus ───────────────────────────────────────
+// Spec §12.3 — normalized schema for all 128,219 morphological segments
+//
+// Layers:
+//   Core      : surahs → verses → words → segments
+//   Linguistic: roots, lemmas, word_roots, word_lemmas
+//   Treebank  : treebank_nodes, treebank_edges
+//   Ontology  : concepts, concept_relations, concept_verses
+//   User      : bookmarks, notes, reading_sessions (Phase 2)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Core Layer ───────────────────────────────────────────────────────────────
+
+model Surah {
+  id               Int       @id                // 1–114
+  nameArabic       String                        // e.g. "ٱلْفَاتِحَة"
+  nameSimple       String                        // e.g. "Al-Fatihah"
+  nameComplex      String                        // e.g. "Al-Fātiĥah"
+  revelationPlace  RevelationPlace
+  revelationOrder  Int
+  versesCount      Int
+  bismillahPre     Boolean   @default(true)
+  translatedName   String
+
+  verses           Verse[]
+
+  @@map("surahs")
+}
+
+model Verse {
+  id             String     @id  // "{surah}:{verse}" e.g. "1:1"
+  surahId        Int
+  verseNumber    Int
+  textUthmani    String     @default("")   // populated from QF API (step 4)
+  textSimple     String     @default("")
+  pageNumber     Int?
+  juzNumber      Int?
+  hizbNumber     Int?
+
+  surah          Surah      @relation(fields: [surahId], references: [id])
+  words          Word[]
+  treebankNodes  TreebankNode[]
+
+  @@unique([surahId, verseNumber])
+  @@index([surahId])
+  @@index([juzNumber])
+  @@map("verses")
+}
+
+model Word {
+  id              String     @id  // "{surah}:{verse}:{word}" e.g. "1:1:1"
+  verseId         String
+  surahId         Int
+  verseNumber     Int
+  position        Int             // 1-indexed within verse
+  textUthmani     String     @default("")   // populated from QF API (step 4)
+  transliteration String     @default("")
+  translation     String     @default("")
+  audioUrl        String     @default("")
+  charTypeName    String     @default("word")  // "word" | "end" | "pause"
+
+  verse           Verse      @relation(fields: [verseId], references: [id])
+  segments        Segment[]
+  wordRoots       WordRoot[]
+  wordLemmas      WordLemma[]
+  treebankNodes   TreebankNode[]
+
+  @@unique([surahId, verseNumber, position])
+  @@index([verseId])
+  @@index([surahId])
+  @@map("words")
+}
+
+model Segment {
+  id               Int      @id @default(autoincrement())
+  wordId           String
+  surahId          Int
+  verseNumber      Int
+  wordPosition     Int
+  segmentPosition  Int      // position within word (1-indexed)
+  formBuckwalter   String   // raw Buckwalter form from corpus
+  formArabic       String   @default("")   // converted Arabic Unicode
+  posTag           String   // one of 44 POS tags
+  segmentType      SegmentType
+  features         Json     // JSONB — all parsed morphological features
+
+  // Hot-path indexed columns (denormalized from features for query speed)
+  rootBuckwalter   String?  // ROOT: feature, e.g. "smw"
+  lemmaBuckwalter  String?  // LEM: feature, e.g. "$isom"
+  gramCase         String?  // NOM | ACC | GEN
+  gramState        String?  // DEF | INDEF
+  verbAspect       String?  // PERF | IMPF | IMPV
+  verbMood         String?  // IND | SUBJ | JUS
+  verbVoice        String?  // ACT | PASS
+  verbForm         String?  // I | II | ... | XII
+  person           String?  // 1 | 2 | 3
+  gender           String?  // M | F
+  number           String?  // S | D | P
+
+  word             Word     @relation(fields: [wordId], references: [id])
+
+  @@unique([surahId, verseNumber, wordPosition, segmentPosition])
+  @@index([wordId])
+  @@index([posTag])
+  @@index([rootBuckwalter])
+  @@index([lemmaBuckwalter])
+  @@index([segmentType])
+  @@map("segments")
+}
+
+// ─── Linguistic Layer ─────────────────────────────────────────────────────────
+
+model Root {
+  id               Int        @id @default(autoincrement())
+  lettersBuckwalter String    @unique  // e.g. "smw"
+  lettersArabic     String            // e.g. "س م و"
+  frequency         Int       @default(0)  // number of word occurrences in Quran
+
+  lemmas           Lemma[]
+  wordRoots        WordRoot[]
+
+  @@index([lettersBuckwalter])
+  @@map("roots")
+}
+
+model Lemma {
+  id               Int        @id @default(autoincrement())
+  rootId           Int?
+  formBuckwalter   String     @unique  // e.g. "$isom"
+  formArabic       String              // e.g. "اسم"
+  posTag           String              // primary POS of this lemma
+  frequency        Int        @default(0)
+
+  root             Root?      @relation(fields: [rootId], references: [id])
+  wordLemmas       WordLemma[]
+
+  @@index([rootId])
+  @@index([formBuckwalter])
+  @@map("lemmas")
+}
+
+model WordRoot {
+  wordId  String
+  rootId  Int
+
+  word    Word   @relation(fields: [wordId], references: [id])
+  root    Root   @relation(fields: [rootId], references: [id])
+
+  @@id([wordId, rootId])
+  @@index([rootId])
+  @@map("word_roots")
+}
+
+model WordLemma {
+  wordId  String
+  lemmaId Int
+
+  word    Word   @relation(fields: [wordId], references: [id])
+  lemma   Lemma  @relation(fields: [lemmaId], references: [id])
+
+  @@id([wordId, lemmaId])
+  @@index([lemmaId])
+  @@map("word_lemmas")
+}
+
+// ─── Treebank Layer ───────────────────────────────────────────────────────────
+
+model TreebankNode {
+  id         String  @id   // unique per verse+position
+  verseId    String
+  wordId     String?        // null for phrase/non-terminal nodes
+  nodeType   NodeType
+  phraseTag  String?        // S | NS | VS | CS | PP | SC (non-terminals)
+  label      String         // display label
+
+  verse      Verse   @relation(fields: [verseId], references: [id])
+  word       Word?   @relation(fields: [wordId], references: [id])
+
+  headEdges  TreebankEdge[] @relation("HeadNode")
+  depEdges   TreebankEdge[] @relation("DependentNode")
+
+  @@index([verseId])
+  @@map("treebank_nodes")
+}
+
+model TreebankEdge {
+  id              Int    @id @default(autoincrement())
+  headNodeId      String
+  dependentNodeId String
+  relation        String // dependency relation label
+
+  headNode        TreebankNode @relation("HeadNode",      fields: [headNodeId],      references: [id])
+  dependentNode   TreebankNode @relation("DependentNode", fields: [dependentNodeId], references: [id])
+
+  @@index([headNodeId])
+  @@index([dependentNodeId])
+  @@map("treebank_edges")
+}
+
+// ─── Ontology Layer ───────────────────────────────────────────────────────────
+
+model Concept {
+  id         String   @id
+  name       String   @unique
+  parentId   String?
+  category   String
+
+  parent     Concept?  @relation("ConceptHierarchy", fields: [parentId], references: [id])
+  children   Concept[] @relation("ConceptHierarchy")
+
+  subjectRelations ConceptRelation[] @relation("SubjectConcept")
+  objectRelations  ConceptRelation[] @relation("ObjectConcept")
+  conceptVerses    ConceptVerse[]
+
+  @@map("concepts")
+}
+
+model ConceptRelation {
+  id        Int    @id @default(autoincrement())
+  subjectId String
+  predicate String // "subclass" | "instance"
+  objectId  String
+
+  subject   Concept @relation("SubjectConcept", fields: [subjectId], references: [id])
+  object    Concept @relation("ObjectConcept",  fields: [objectId],  references: [id])
+
+  @@map("concept_relations")
+}
+
+model ConceptVerse {
+  id         Int     @id @default(autoincrement())
+  conceptId  String
+  verseId    String
+  wordId     String?
+
+  concept    Concept @relation(fields: [conceptId], references: [id])
+
+  @@index([conceptId])
+  @@index([verseId])
+  @@map("concept_verses")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum RevelationPlace {
+  makkah
+  madinah
+}
+
+enum SegmentType {
+  PREFIX
+  STEM
+  SUFFIX
+}
+
+enum NodeType {
+  terminal
+  non_terminal
+  hidden
+}
