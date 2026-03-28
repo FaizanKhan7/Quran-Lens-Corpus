@@ -83,22 +83,29 @@ export interface CorpusLocation {
 // ─── Morphological Segment ────────────────────────────────────────────────────
 
 export interface MorphologicalFeatures {
+  // Root & lemma
   root?: string;
   rootArabic?: string;
   lemma?: string;
   lemmaArabic?: string;
-  case?: NominalCase;
-  state?: NominalState;
+  // Nominal
+  gramCase?: NominalCase;   // NOM | ACC | GEN
+  gramState?: NominalState; // DEF | INDEF
+  // Person / Gender / Number (shared nominals + verbs)
   person?: Person;
   gender?: Gender;
   number?: GrammaticalNumber;
-  aspect?: VerbAspect;
-  mood?: VerbMood;
-  voice?: VerbVoice;
-  verbForm?: VerbForm;
+  // Verbal
+  verbAspect?: VerbAspect; // PERF | IMPF | IMPV
+  verbMood?: VerbMood;     // IND | SUBJ | JUS
+  verbVoice?: VerbVoice;   // ACT | PASS
+  verbForm?: VerbForm;     // I–XII
   derivation?: DerivationType;
+  // Prefix / suffix
   prefix?: string;
   suffixPronoun?: string;
+  specialGroup?: string;
+  segmentType?: string;
 }
 
 export interface Segment {

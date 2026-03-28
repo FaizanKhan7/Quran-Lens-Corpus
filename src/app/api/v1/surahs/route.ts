@@ -1,13 +1,12 @@
 // GET /api/v1/surahs
 // Returns all 114 surahs.
 
-import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ok, serverError, CORS } from "@/lib/api-helpers";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   try {
     const surahs = await prisma.surah.findMany({
       orderBy: { id: "asc" },
