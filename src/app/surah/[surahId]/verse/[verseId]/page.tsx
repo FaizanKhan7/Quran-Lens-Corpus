@@ -8,6 +8,8 @@ import { notFound } from "next/navigation";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { VerseWordGrid } from "@/components/ui/VerseWordGrid";
 import { getVerseData } from "@/lib/verse-data";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { BookmarkButton } from "@/components/ui/BookmarkButton";
 
 interface Props {
   params: Promise<{ surahId: string; verseId: string }>;
@@ -40,54 +42,21 @@ export default async function VersePage({ params }: Props) {
 
   return (
     <>
-      <main className="flex-1 pb-20 md:pb-4" dir="ltr">
+      <main className="flex-1 pb-nav" dir="ltr">
         <div
           className="w-full mx-auto py-6 px-4"
           style={{ maxWidth: "var(--token-layout-max-content)" }}
         >
 
           {/* ── Breadcrumb — spec §9.2 ───────────────────────────────────── */}
-          <nav aria-label="Breadcrumb" className="mb-6">
-            <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 latin text-sm"
-                style={{ color: "var(--token-text-tertiary)" }}>
-              <li>
-                <Link
-                  href="/"
-                  className="inline-link hover:underline"
-                  style={{ color: "inherit" }}
-                >
-                  Home
-                </Link>
-              </li>
-              <li aria-hidden="true">›</li>
-              <li>
-                <Link
-                  href="/surah"
-                  className="inline-link hover:underline"
-                  style={{ color: "inherit" }}
-                >
-                  All Surahs
-                </Link>
-              </li>
-              <li aria-hidden="true">›</li>
-              <li>
-                <Link
-                  href={`/surah/${surahNum}`}
-                  className="inline-link hover:underline"
-                  style={{ color: "inherit" }}
-                >
-                  {surahNameSimple}
-                </Link>
-              </li>
-              <li aria-hidden="true">›</li>
-              <li
-                aria-current="page"
-                style={{ color: "var(--token-text-primary)" }}
-              >
-                Verse {verseNum}
-              </li>
-            </ol>
-          </nav>
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              { label: "All Surahs", href: "/surah" },
+              { label: surahNameSimple, href: `/surah/${surahNum}` },
+              { label: `Verse ${verseNum}` },
+            ]}
+          />
 
           {/* ── Verse Arabic text header ─────────────────────────────────── */}
           <header className="mb-8">
@@ -99,12 +68,22 @@ export default async function VersePage({ params }: Props) {
             >
               {verse.textUthmani}
             </p>
-            <p
-              className="latin text-sm"
-              style={{ color: "var(--token-text-tertiary)" }}
-            >
-              {words.length} word{words.length !== 1 ? "s" : ""}
-            </p>
+            <div className="flex items-center justify-between gap-4">
+              <p
+                className="latin text-sm"
+                style={{ color: "var(--token-text-tertiary)" }}
+              >
+                {words.length} word{words.length !== 1 ? "s" : ""}
+              </p>
+              <BookmarkButton
+                type="verse"
+                surahId={surahNum}
+                verseNumber={verseNum}
+                textUthmani={verse.textUthmani}
+                surahNameSimple={surahNameSimple}
+                variant="pill"
+              />
+            </div>
           </header>
 
           {/* ── Word-by-word grid ────────────────────────────────────────── */}

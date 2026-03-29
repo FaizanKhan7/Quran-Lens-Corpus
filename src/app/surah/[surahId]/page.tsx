@@ -9,6 +9,7 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { VerseAccordion } from "@/components/ui/VerseAccordion";
 import { JumpToVerse } from "@/components/ui/JumpToVerse";
 import { getSurahData } from "@/lib/surah-data";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 
 interface Props {
   params: Promise<{ surahId: string }>;
@@ -39,46 +40,20 @@ export default async function SurahPage({ params }: Props) {
 
   return (
     <>
-      <main className="flex-1 pb-20 md:pb-4" dir="ltr">
+      <main className="flex-1 pb-nav" dir="ltr">
         <div
           className="w-full mx-auto py-6 px-4"
           style={{ maxWidth: "var(--token-layout-max-content)" }}
         >
 
           {/* ── Breadcrumb — spec §9.2 ───────────────────────────────────── */}
-          <nav aria-label="Breadcrumb" className="mb-6">
-            <ol
-              className="flex flex-wrap items-center gap-x-2 gap-y-1 latin text-sm"
-              style={{ color: "var(--token-text-tertiary)" }}
-            >
-              <li>
-                <Link
-                  href="/"
-                  className="inline-link hover:underline"
-                  style={{ color: "inherit" }}
-                >
-                  Home
-                </Link>
-              </li>
-              <li aria-hidden="true">›</li>
-              <li>
-                <Link
-                  href="/surah"
-                  className="inline-link hover:underline"
-                  style={{ color: "inherit" }}
-                >
-                  All Surahs
-                </Link>
-              </li>
-              <li aria-hidden="true">›</li>
-              <li
-                aria-current="page"
-                style={{ color: "var(--token-text-primary)" }}
-              >
-                {surah.nameSimple}
-              </li>
-            </ol>
-          </nav>
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              { label: "All Surahs", href: "/surah" },
+              { label: surah.nameSimple, labelArabic: surah.nameArabic },
+            ]}
+          />
 
           {/* ── Surah header ─────────────────────────────────────────────── */}
           <header className="mb-8">

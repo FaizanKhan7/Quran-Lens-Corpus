@@ -17,7 +17,7 @@
  *   - Link to full verse detail page (Level 2 → Level 3 navigation)
  */
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { VerseWordGrid } from "@/components/ui/VerseWordGrid";
@@ -70,14 +70,17 @@ export interface VerseAccordionProps {
 }
 
 export function VerseAccordion({ verse, surahId }: VerseAccordionProps) {
-  const [expanded, setExpanded] = useState(false);
-  const [words, setWords]       = useState<Word[] | null>(null);
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState<string | null>(null);
+  const [expanded,    setExpanded]    = useState(false);
+  const [words,       setWords]       = useState<Word[] | null>(null);
+  const [loading,     setLoading]     = useState(false);
+  const [error,       setError]       = useState<string | null>(null);
+  const [hashTarget,  setHashTarget]  = useState(false);
   // Prevents duplicate fetches — cleared only on error (to allow retry)
   const fetchedRef = useRef(false);
 
-  async function loadWords() {
+  const anchorId = `verse-${verse.verseNumber}`;
+
+  const loadWords = useCallback(async () => {
     if (fetchedRef.current) return;
     fetchedRef.current = true;
     setLoading(true);
@@ -94,12 +97,49 @@ export function VerseAccordion({ verse, surahId }: VerseAccordionProps) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [verse.id, surahId]);
+
+  // ── Hash-based open state ────────────────────────────────────────────────
+  // Spec §9.2: deep-linkable — /surah/2#verse-255 opens that accordion.
+  // hashchange fires when JumpToVerse (or any code) changes the hash in-page.
+
+  const openFromHash = useCallback(() => {
+    if (window.location.hash === `#${anchorId}`) {
+      setExpanded(true);
+      void loadWords();
+      // Brief highlight pulse + smooth scroll on hash-triggered open
+      setHashTarget(true);
+      setTimeout(() => setHashTarget(false), 1400);
+      requestAnimationFrame(() => {
+        document.getElementById(anchorId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, [anchorId, loadWords]);
+
+  useEffect(() => {
+    // Check hash on mount (direct link / page load)
+    openFromHash();
+    // React to in-page hash changes (JumpToVerse, browser back/forward)
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, [openFromHash]);
+
+  // ── Write hash on user-triggered toggle ─────────────────────────────────
 
   function handleToggle() {
     const next = !expanded;
     setExpanded(next);
-    if (next && !fetchedRef.current) void loadWords();
+    if (next) {
+      if (!fetchedRef.current) void loadWords();
+      // Push anchor into URL without adding a new history entry —
+      // allows sharing this URL to land on the open accordion.
+      const { pathname, search } = window.location;
+      history.replaceState(null, "", `${pathname}${search}#${anchorId}`);
+    } else {
+      // Remove hash when closing so siblings can take over cleanly.
+      const { pathname, search } = window.location;
+      history.replaceState(null, "", `${pathname}${search}`);
+    }
   }
 
   function handleRetry() {
@@ -111,7 +151,12 @@ export function VerseAccordion({ verse, surahId }: VerseAccordionProps) {
 
   return (
     <div
-      className={cn("verse-accordion", expanded && "verse-accordion--expanded")}
+      id={anchorId}
+      className={cn(
+        "verse-accordion",
+        expanded    && "verse-accordion--expanded",
+        hashTarget  && "verse-accordion--hash-target",
+      )}
       data-verse={verse.id}
     >
       {/* ── Tier 1 trigger — full bar clickable (spec §10.2) ─────────────── */}

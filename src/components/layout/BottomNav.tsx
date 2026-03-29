@@ -145,7 +145,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="التنقل الرئيسي"
-      className="fixed bottom-0 inset-x-0 z-50 bg-[var(--color-bg)] border-t border-[var(--color-border-base)] safe-area-inset-bottom md:hidden"
+      className="fixed bottom-0 inset-x-0 z-50 bg-surface border-t border-border-subtle pb-safe md:hidden"
     >
       <ul className="flex items-stretch" role="list">
         {NAV_ITEMS.map((item) => {
@@ -165,8 +165,8 @@ export function BottomNav() {
                   "min-h-[3rem] text-xs font-medium transition-colors duration-150",
                   "focus-visible:outline-2 focus-visible:outline-[var(--color-focus-ring)] focus-visible:outline-offset-[-2px]",
                   isActive
-                    ? "text-[var(--color-pos-verbal-display)]"
-                    : "text-[var(--color-fg-muted)] hover:text-[var(--color-fg)]"
+                    ? "text-pos-verbal"
+                    : "text-text-secondary hover:text-text-primary"
                 )}
               >
                 {item.icon}

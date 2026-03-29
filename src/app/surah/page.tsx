@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { getAllSurahs } from "@/lib/surah-data";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 
 export const metadata: Metadata = {
   title: "Browse Surahs — Quran Lens",
@@ -19,32 +20,17 @@ export default async function SurahListPage() {
 
   return (
     <>
-      <main className="flex-1 pb-20 md:pb-4" dir="ltr">
+      <main className="flex-1 pb-nav" dir="ltr">
         <div
           className="w-full mx-auto py-6 px-4"
           style={{ maxWidth: "var(--token-layout-max-content)" }}
         >
-          {/* Breadcrumb */}
-          <nav aria-label="Breadcrumb" className="mb-6">
-            <ol
-              className="flex items-center gap-x-2 latin text-sm"
-              style={{ color: "var(--token-text-tertiary)" }}
-            >
-              <li>
-                <Link
-                  href="/"
-                  className="inline-link hover:underline"
-                  style={{ color: "inherit" }}
-                >
-                  Home
-                </Link>
-              </li>
-              <li aria-hidden="true">›</li>
-              <li style={{ color: "var(--token-text-primary)" }} aria-current="page">
-                All Surahs
-              </li>
-            </ol>
-          </nav>
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              { label: "All Surahs" },
+            ]}
+          />
 
           <h1
             className="latin text-2xl font-bold mb-6"

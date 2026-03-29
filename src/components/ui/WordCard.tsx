@@ -18,8 +18,12 @@
  */
 
 import { useState } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { POSBadge } from "@/components/ui/POSBadge";
+import { WordDetailDrawer } from "@/components/ui/WordDetailDrawer";
+import { WordAudioButton } from "@/components/ui/WordAudioButton";
+import { BookmarkButton } from "@/components/ui/BookmarkButton";
 import type { Word, Segment, POSTag } from "@/types/corpus";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -60,7 +64,7 @@ const PERSON_LABEL: Record<string, string> = {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function DetailRow({ label, value }: { label: string; value: string }) {
+function DetailRow({ label, value, bidi }: { label: string; value: string; bidi?: boolean }) {
   return (
     <div className="flex items-baseline gap-2">
       <span
@@ -69,12 +73,22 @@ function DetailRow({ label, value }: { label: string; value: string }) {
       >
         {label}
       </span>
-      <span
-        className="text-text-secondary"
-        style={{ fontSize: "var(--token-font-size-latin-sm)" }}
-      >
-        {value}
-      </span>
+      {/* bidi: wrap in <bdi> to isolate mixed Arabic + Buckwalter from surrounding direction (spec §14.2) */}
+      {bidi ? (
+        <bdi
+          className="text-text-secondary"
+          style={{ fontSize: "var(--token-font-size-latin-sm)" }}
+        >
+          {value}
+        </bdi>
+      ) : (
+        <span
+          className="text-text-secondary"
+          style={{ fontSize: "var(--token-font-size-latin-sm)" }}
+        >
+          {value}
+        </span>
+      )}
     </div>
   );
 }
@@ -97,28 +111,32 @@ export function WordCard({
   className,
 }: WordCardProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const tierFourUrl = `/surah/${word.surah}/verse/${word.verse}/word/${word.position}`;
 
   const stem = stemSegment(word.segments);
   const posTag = stem?.posTag as POSTag | undefined;
   const features = stem?.features ?? {};
 
   // Collect visible morphological detail rows for Tier 2
-  const details: { label: string; value: string }[] = [];
+  const details: { label: string; value: string; bidi?: boolean }[] = [];
 
   if (word.transliteration) {
     details.push({ label: "Translit.", value: word.transliteration });
   }
   if (features.root) {
+    // Build display as JSX element to isolate Arabic from Buckwalter (spec §14.2)
     const rootDisplay = features.rootArabic
       ? `${features.rootArabic} · ${features.root}`
       : features.root;
-    details.push({ label: "Root", value: rootDisplay });
+    details.push({ label: "Root", value: rootDisplay, bidi: true });
   }
   if (features.lemma) {
     const lemmaDisplay = features.lemmaArabic
       ? `${features.lemmaArabic} · ${features.lemma}`
       : features.lemma;
-    details.push({ label: "Lemma", value: lemmaDisplay });
+    details.push({ label: "Lemma", value: lemmaDisplay, bidi: true });
   }
   if (features.verbAspect) {
     details.push({ label: "Aspect", value: ASPECT_LABEL[features.verbAspect] ?? features.verbAspect });
@@ -154,50 +172,59 @@ export function WordCard({
       )}
       data-location={word.location}
     >
-      {/* ── Tier 1 trigger — full bar is the button (spec §10.1) ─────────── */}
-      <button
-        type="button"
-        aria-expanded={expanded}
-        aria-label={`${word.textUthmani} — ${word.translation ?? ""}. ${expanded ? "Collapse" : "Expand"} word details`}
-        onClick={handleToggle}
-        className="word-card__trigger"
-      >
-        {/* Arabic word */}
-        <span
-          lang="ar"
-          dir="rtl"
-          className="word-card__arabic arabic"
+      {/* ── Tier 1 — header: trigger + audio button (spec §10.1, F09) ────── */}
+      <div className="word-card__header">
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-label={`${word.textUthmani} — ${word.translation ?? ""}. ${expanded ? "Collapse" : "Expand"} word details`}
+          onClick={handleToggle}
+          className="word-card__trigger"
         >
-          {word.textUthmani}
-        </span>
-
-        {/* English gloss */}
-        {word.translation && (
+          {/* Arabic word */}
           <span
-            dir="ltr"
-            className="word-card__gloss latin"
+            lang="ar"
+            dir="rtl"
+            className="word-card__arabic arabic"
           >
-            {word.translation}
+            {word.textUthmani}
           </span>
-        )}
 
-        {/* POS badge */}
-        {posTag && (
-          <POSBadge
-            tag={posTag}
-            showTooltip={false}
-            className="word-card__pos-badge"
-          />
-        )}
+          {/* English gloss */}
+          {word.translation && (
+            <span
+              dir="ltr"
+              className="word-card__gloss latin"
+            >
+              {word.translation}
+            </span>
+          )}
 
-        {/* Expand chevron */}
-        <span
-          className={cn("word-card__chevron", expanded && "word-card__chevron--open")}
-          aria-hidden="true"
-        >
-          ›
-        </span>
-      </button>
+          {/* POS badge */}
+          {posTag && (
+            <POSBadge
+              tag={posTag}
+              showTooltip={false}
+              className="word-card__pos-badge"
+            />
+          )}
+
+          {/* Expand chevron */}
+          <span
+            className={cn("word-card__chevron", expanded && "word-card__chevron--open")}
+            aria-hidden="true"
+          >
+            ›
+          </span>
+        </button>
+
+        {/* Audio play button — sibling of trigger, not inside it (valid HTML) */}
+        <WordAudioButton
+          surah={word.surah}
+          verse={word.verse}
+          position={word.position}
+        />
+      </div>
 
       {/* ── Tier 2 — expanded details (inline accordion, spec §10.1) ────── */}
       {expanded && details.length > 0 && (
@@ -207,8 +234,8 @@ export function WordCard({
           role="region"
           aria-label={`Details for ${word.textUthmani}`}
         >
-          {details.map(({ label, value }) => (
-            <DetailRow key={label} label={label} value={value} />
+          {details.map(({ label, value, bidi }) => (
+            <DetailRow key={label} label={label} value={value} bidi={bidi} />
           ))}
 
           {/* Prefix segments */}
@@ -240,8 +267,58 @@ export function WordCard({
               </div>
             </div>
           )}
+
+          {/* Tier 3 + Tier 4 + Bookmark actions */}
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              className="latin"
+              style={{
+                fontSize: "var(--token-font-size-latin-xs)",
+                color: "var(--token-pos-verbal)",
+                border: "1px solid var(--token-pos-verbal-ring)",
+                borderRadius: "var(--primitive-radius-4)",
+                padding: "2px 8px",
+                background: "none",
+                cursor: "pointer",
+                minHeight: "unset",
+                minWidth: "unset",
+              }}
+            >
+              Full breakdown
+            </button>
+            <Link
+              href={tierFourUrl}
+              className="inline-link latin"
+              style={{
+                fontSize: "var(--token-font-size-latin-xs)",
+                color: "var(--token-text-tertiary)",
+              }}
+            >
+              Deep analysis →
+            </Link>
+            <BookmarkButton
+              variant="pill"
+              type="word"
+              surahId={word.surah}
+              verseNumber={word.verse}
+              wordPosition={word.position}
+              textUthmani={word.textUthmani}
+              translation={word.translation}
+              transliteration={word.transliteration}
+              surahNameSimple={`Surah ${word.surah}`}
+            />
+          </div>
         </div>
       )}
+
+      {/* Tier 3 drawer */}
+      <WordDetailDrawer
+        word={word}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      />
     </div>
   );
 }

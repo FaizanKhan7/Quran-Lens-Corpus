@@ -72,7 +72,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${inter.variable} ${amiri.variable} ${GeistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-dvh flex flex-col bg-[var(--color-bg)] text-[var(--color-fg)]">
+      <body className="min-h-dvh flex flex-col bg-surface text-text-primary">
         <ThemeProvider>
           <FontWatcher />
           {children}

@@ -21,7 +21,7 @@ export default async function HomePage() {
   return (
     <>
       <main
-        className="flex-1 flex flex-col items-center justify-center px-card-padding pb-16 md:pb-0"
+        className="flex-1 flex flex-col items-center justify-center px-card-padding pb-nav"
         dir="rtl"
       >
         <div className="w-full max-w-content mx-auto">

@@ -3,7 +3,7 @@
 
 export default function VerseLoading() {
   return (
-    <main className="flex-1 pb-20 md:pb-4" dir="ltr">
+    <main className="flex-1 pb-nav" dir="ltr">
       <div
         className="w-full mx-auto py-6 px-4"
         style={{ maxWidth: "var(--token-layout-max-content)" }}

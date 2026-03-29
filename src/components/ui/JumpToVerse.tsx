@@ -1,22 +1,24 @@
 "use client";
 
 /**
- * JumpToVerse — compact form that navigates directly to a verse number.
+ * JumpToVerse — compact form that navigates to a verse number in-page.
  * Spec §11 F10: "Verse navigation (prev/next, jump-to)"
+ *
+ * Uses hash-based navigation (#verse-N) so the user stays on the surah
+ * listing page. VerseAccordion listens for the hashchange event and opens
+ * the matching accordion, scrolling it into view.
  */
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 
 interface JumpToVerseProps {
   surahId:     number;
   versesCount: number;
 }
 
-export function JumpToVerse({ surahId, versesCount }: JumpToVerseProps) {
+export function JumpToVerse({ surahId: _surahId, versesCount }: JumpToVerseProps) {
   const [value, setValue] = useState("");
   const [error, setError] = useState(false);
-  const router = useRouter();
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,7 +28,11 @@ export function JumpToVerse({ surahId, versesCount }: JumpToVerseProps) {
       return;
     }
     setError(false);
-    router.push(`/surah/${surahId}/verse/${n}`);
+    // Update the hash — triggers hashchange, which VerseAccordion listens for.
+    // history.pushState preserves a back-navigation entry.
+    const { pathname, search } = window.location;
+    history.pushState(null, "", `${pathname}${search}#verse-${n}`);
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
   }
 
   return (
@@ -45,6 +51,7 @@ export function JumpToVerse({ surahId, versesCount }: JumpToVerseProps) {
         <input
           id="jump-verse-input"
           type="number"
+          dir="auto"
           min={1}
           max={versesCount}
           value={value}

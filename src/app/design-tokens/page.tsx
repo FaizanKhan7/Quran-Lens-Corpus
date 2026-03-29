@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function DesignTokensPage() {
   return (
     <>
-      <main className="flex-1 pb-20 md:pb-4" dir="ltr">
+      <main className="flex-1 pb-nav" dir="ltr">
         <TokenShowcase />
       </main>
       <BottomNav />
