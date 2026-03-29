@@ -34,7 +34,9 @@ interface PageSearchParams {
   page?:   string;
   pos?:    string;
   aspect?: string;
+  mood?:   string;
   voice?:  string;
+  form?:   string;
   person?: string;
   gender?: string;
   number?: string;
@@ -62,7 +64,9 @@ export default async function SearchPage({ searchParams }: Props) {
   const morphFilters: Record<string, string> = {};
   if (sp.pos)    morphFilters.pos    = sp.pos;
   if (sp.aspect) morphFilters.aspect = sp.aspect;
+  if (sp.mood)   morphFilters.mood   = sp.mood;
   if (sp.voice)  morphFilters.voice  = sp.voice;
+  if (sp.form)   morphFilters.form   = sp.form;
   if (sp.person) morphFilters.person = sp.person;
   if (sp.gender) morphFilters.gender = sp.gender;
   if (sp.number) morphFilters.number = sp.number;
@@ -327,8 +331,11 @@ function MorphResultTable({ results }: { results: MorphResult[] }) {
           <th scope="col">Word</th>
           <th scope="col">POS</th>
           <th scope="col">Root</th>
-          <th scope="col">Case</th>
           <th scope="col">Aspect</th>
+          <th scope="col">Mood</th>
+          <th scope="col">Voice</th>
+          <th scope="col">Form</th>
+          <th scope="col">Case</th>
           <th scope="col">P/G/N</th>
           <th scope="col">Location</th>
         </tr>
@@ -362,8 +369,11 @@ function MorphResultRow({ result }: { result: MorphResult }) {
           <span className="text-[var(--token-text-tertiary)]">—</span>
         )}
       </td>
-      <td>{result.gramCase ?? "—"}</td>
       <td>{result.verbAspect ?? "—"}</td>
+      <td>{result.verbMood  ?? "—"}</td>
+      <td>{result.verbVoice ?? "—"}</td>
+      <td>{result.verbForm  ?? "—"}</td>
+      <td>{result.gramCase  ?? "—"}</td>
       <td>{pgn || "—"}</td>
       <td>
         <Link

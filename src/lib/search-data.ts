@@ -38,6 +38,9 @@ export interface MorphResult {
   rootBuckwalter:  string | null;
   gramCase:        string | null;
   verbAspect:      string | null;
+  verbMood:        string | null;
+  verbVoice:       string | null;
+  verbForm:        string | null;
   person:          string | null;
   gender:          string | null;
   number:          string | null;
@@ -231,6 +234,9 @@ export async function searchMorphological(
     rootBuckwalter: seg.rootBuckwalter,
     gramCase:       seg.gramCase,
     verbAspect:     seg.verbAspect,
+    verbMood:       seg.verbMood,
+    verbVoice:      seg.verbVoice,
+    verbForm:       seg.verbForm,
     person:         seg.person,
     gender:         seg.gender,
     number:         seg.number,
