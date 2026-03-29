@@ -91,6 +91,18 @@ export default async function VersePage({ params }: Props) {
             <VerseWordGrid words={words} />
           </section>
 
+          {/* ── Treebank link — spec §10.3 F11 ───────────────────────────── */}
+          <div className="mt-6">
+            <Link
+              href={`/surah/${surahNum}/verse/${verseNum}/treebank`}
+              className="treebank-entry-link latin"
+            >
+              <span className="treebank-entry-link__icon" aria-hidden="true">⬡</span>
+              <span>View dependency tree</span>
+              <span className="treebank-entry-link__arrow" aria-hidden="true">→</span>
+            </Link>
+          </div>
+
           {/* ── Prev / Next verse navigation — spec §11 F10 ─────────────── */}
           <nav
             aria-label="Verse navigation"

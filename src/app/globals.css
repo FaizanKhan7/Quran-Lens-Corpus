@@ -3185,3 +3185,187 @@ html {
   color: var(--token-pos-particle);
   border-color: color-mix(in srgb, var(--token-pos-particle) 40%, transparent);
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * /surah/[s]/verse/[v]/treebank  — dependency tree viewer (spec §10.3)
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* Entry link on verse detail page */
+.treebank-entry-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid var(--token-border-subtle);
+  border-radius: var(--primitive-radius-8);
+  color: var(--token-text-secondary);
+  font-size: var(--token-font-size-latin-sm);
+  text-decoration: none;
+  transition: background-color 150ms, border-color 150ms, color 150ms;
+}
+
+.treebank-entry-link:hover {
+  background-color: var(--token-surface-raised);
+  border-color: var(--token-pos-verbal);
+  color: var(--token-text-primary);
+}
+
+.treebank-entry-link__icon {
+  font-size: 16px;
+  color: var(--token-pos-verbal);
+}
+
+.treebank-entry-link__arrow {
+  margin-inline-start: auto;
+  color: var(--token-text-tertiary);
+}
+
+/* Viewer layout */
+.treebank-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--token-border-subtle);
+  border-radius: var(--primitive-radius-8);
+  overflow: hidden;
+}
+
+/* Toolbar */
+.treebank-viewer__toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--token-border-subtle);
+  background-color: var(--token-surface-raised);
+}
+
+.treebank-viewer__toolbar-label {
+  font-size: var(--token-font-size-latin-xs);
+  color: var(--token-text-tertiary);
+  margin-inline-end: 2px;
+}
+
+.treebank-toggle-btn {
+  font-size: var(--token-font-size-latin-xs);
+  padding: 3px 10px;
+  border: 1px solid var(--token-border-subtle);
+  border-radius: 99px;
+  background: none;
+  color: var(--token-text-secondary);
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms, border-color 120ms;
+  min-height: unset;
+  min-width: unset;
+}
+
+.treebank-toggle-btn:hover {
+  background-color: var(--token-surface-card);
+  border-color: var(--token-pos-verbal);
+  color: var(--token-text-primary);
+}
+
+.treebank-toggle-btn--on {
+  background-color: color-mix(in srgb, var(--token-pos-verbal) 12%, transparent);
+  border-color: var(--token-pos-verbal);
+  color: var(--token-pos-verbal);
+}
+
+.treebank-toggle-btn--clear {
+  border-color: var(--token-pos-particle);
+  color: var(--token-pos-particle);
+}
+
+.treebank-viewer__toolbar-hint {
+  font-size: 10px;
+  color: var(--token-text-tertiary);
+  margin-inline-start: auto;
+}
+
+@media (max-width: 639px) {
+  .treebank-viewer__toolbar-hint {
+    display: none;
+  }
+}
+
+/* SVG canvas */
+.treebank-viewer__canvas {
+  width: 100%;
+  height: 480px;
+  overflow: hidden;
+  background-color: var(--token-surface-page);
+  position: relative;
+}
+
+@media (max-width: 639px) {
+  .treebank-viewer__canvas {
+    height: 360px;
+  }
+}
+
+.treebank-viewer__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Legend */
+.treebank-viewer__legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--token-border-subtle);
+  background-color: var(--token-surface-raised);
+}
+
+.treebank-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--token-text-secondary);
+}
+
+.treebank-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* Empty / incomplete states */
+.treebank-incomplete-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border: 1px solid color-mix(in srgb, var(--token-pos-particle) 40%, transparent);
+  border-radius: var(--primitive-radius-4);
+  font-size: var(--token-font-size-latin-sm);
+  color: var(--token-pos-particle);
+  background-color: color-mix(in srgb, var(--token-pos-particle) 8%, transparent);
+}
+
+.treebank-empty {
+  padding: 48px 24px;
+  text-align: center;
+  border: 1px dashed var(--token-border-subtle);
+  border-radius: var(--primitive-radius-8);
+}
+
+.treebank-empty__title {
+  font-size: var(--token-font-size-latin-md);
+  color: var(--token-text-secondary);
+  margin-bottom: 8px;
+}
+
+.treebank-empty__hint {
+  font-size: var(--token-font-size-latin-sm);
+  color: var(--token-text-tertiary);
+  max-width: 420px;
+  margin: 0 auto;
+}
