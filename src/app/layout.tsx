@@ -4,6 +4,9 @@ import { Amiri } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { FontWatcher } from "@/components/providers/FontWatcher";
+import { PwaInit } from "@/components/providers/PwaInit";
+import { AuthProvider } from "@/components/providers/AuthProvider";
+import { OfflineBanner } from "@/components/ui/OfflineBanner";
 import "./globals.css";
 
 const inter = Inter({
@@ -41,6 +44,12 @@ export const metadata: Metadata = {
   keywords: ["Quran", "Arabic", "morphology", "corpus", "treebank", "linguistics"],
   authors: [{ name: "Quran Lens" }],
   metadataBase: new URL("https://quran-lens.app"),
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Quran Lens",
+    statusBarStyle: "default",
+  },
   openGraph: {
     title: "Quran Lens",
     description:
@@ -74,8 +83,12 @@ export default function RootLayout({
     >
       <body className="min-h-dvh flex flex-col bg-surface text-text-primary">
         <ThemeProvider>
-          <FontWatcher />
-          {children}
+          <AuthProvider>
+            <PwaInit />
+            <OfflineBanner />
+            <FontWatcher />
+            {children}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

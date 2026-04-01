@@ -1,26 +1,28 @@
 // GET /api/v1/search
-// Unified search across verses, roots, and lemmas.
+// Unified search across words, roots, and morphological segments.
+//
+// Text and root search route through Elasticsearch when ELASTICSEARCH_URL is
+// set; fall back to Postgres automatically. Morphological search is always
+// Postgres (exact keyword filters are equally fast there).
 //
 // Query params:
-//   q        — search query (required)
+//   q        — search query (required for text/root)
 //   type     — "text" | "root" | "morphological" (default: "text")
 //   page, per_page
 //
-// Morphological search params (when type=morphological):
+// Morphological filters (type=morphological):
 //   pos, aspect, mood, voice, form, person, gender, number, case, state
 //
 // Examples:
-//   /api/v1/search?q=رحم&type=root
-//   /api/v1/search?q=بسم&type=text
+//   /api/v1/search?q=رحم&type=text
+//   /api/v1/search?q=rHm&type=root
 //   /api/v1/search?type=morphological&pos=V&aspect=PERF&person=3&gender=M&number=P
 
 import type { NextRequest } from "next/server";
-import { prisma } from "@/lib/prisma";
 import {
-  ok, badRequest, serverError, CORS,
-  parsePagination, withPagination, isArabicScript,
+  ok, badRequest, serverError, CORS, parsePagination, withPagination,
 } from "@/lib/api-helpers";
-import { arabicToBuckwalter } from "@/lib/buckwalter";
+import { searchText, searchRoot, searchMorphological } from "@/lib/search-data";
 
 export const dynamic = "force-dynamic";
 
@@ -35,68 +37,30 @@ export async function GET(req: NextRequest) {
       return badRequest("Query parameter 'q' is required");
     }
 
-    // ── Text search — search verse Uthmani text ──────────────────────────────
+    // ── Text search ───────────────────────────────────────────────────────────
     if (type === "text") {
-      const where = { textUthmani: { contains: q } };
-
-      const [verses, total] = await prisma.$transaction([
-        prisma.verse.findMany({
-          where,
-          orderBy: [{ surahId: "asc" }, { verseNumber: "asc" }],
-          skip:    pg.skip,
-          take:    pg.take,
-          select: {
-            id:          true,
-            surahId:     true,
-            verseNumber: true,
-            textUthmani: true,
-          },
-        }),
-        prisma.verse.count({ where }),
-      ]);
-
+      const data = await searchText(q, pg.page, pg.perPage);
       return ok({
         type: "text",
         query: q,
-        ...withPagination(verses, total, pg),
+        engine: data.esEnabled ? "elasticsearch" : "postgres",
+        ...withPagination(data.textResults ?? [], data.total, pg),
       });
     }
 
-    // ── Root search ──────────────────────────────────────────────────────────
+    // ── Root search ───────────────────────────────────────────────────────────
     if (type === "root") {
-      const bw = isArabicScript(q)
-        ? arabicToBuckwalter(q).replace(/\s+/g, "")
-        : q;
-
-      const where = {
-        OR: [
-          { lettersBuckwalter: { contains: bw,  mode: "insensitive" as const } },
-          { lettersArabic:     { contains: q } },
-        ],
-      };
-
-      const [roots, total] = await prisma.$transaction([
-        prisma.root.findMany({
-          where,
-          orderBy: { frequency: "desc" },
-          skip:    pg.skip,
-          take:    pg.take,
-        }),
-        prisma.root.count({ where }),
-      ]);
-
+      const data = await searchRoot(q, pg.page, pg.perPage);
       return ok({
         type: "root",
         query: q,
-        ...withPagination(roots, total, pg),
+        engine: data.esEnabled ? "elasticsearch" : "postgres",
+        ...withPagination(data.rootResults ?? [], data.total, pg),
       });
     }
 
-    // ── Morphological search ─────────────────────────────────────────────────
+    // ── Morphological search (always Postgres) ────────────────────────────────
     if (type === "morphological") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const where: any = { segmentType: "STEM" };
-
       const pos    = sp.get("pos");
       const aspect = sp.get("aspect");
       const mood   = sp.get("mood");
@@ -108,58 +72,34 @@ export async function GET(req: NextRequest) {
       const gcase  = sp.get("case");
       const state  = sp.get("state");
 
-      if (!pos && !aspect && !mood && !voice && !form && !person && !gender && !number && !gcase && !state) {
-        return badRequest("Morphological search requires at least one filter (pos, aspect, mood, voice, form, person, gender, number, case, state)");
+      const filters: Record<string, string> = {};
+      if (pos)    filters.pos    = pos;
+      if (aspect) filters.aspect = aspect;
+      if (mood)   filters.mood   = mood;
+      if (voice)  filters.voice  = voice;
+      if (form)   filters.form   = form;
+      if (person) filters.person = person;
+      if (gender) filters.gender = gender;
+      if (number) filters.number = number;
+      if (gcase)  filters.case   = gcase;
+      if (state)  filters.state  = state;
+
+      if (Object.keys(filters).length === 0) {
+        return badRequest(
+          "Morphological search requires at least one filter: pos, aspect, mood, voice, form, person, gender, number, case, state"
+        );
       }
 
-      if (pos)    where.posTag     = pos.toUpperCase();
-      if (aspect) where.verbAspect = aspect.toUpperCase();
-      if (mood)   where.verbMood   = mood.toUpperCase();
-      if (voice)  where.verbVoice  = voice.toUpperCase();
-      if (form)   where.verbForm   = form.toUpperCase();
-      if (person) where.person     = person;
-      if (gender) where.gender     = gender.toUpperCase();
-      if (number) where.number     = number.toUpperCase();
-      if (gcase)  where.gramCase   = gcase.toUpperCase();
-      if (state)  where.gramState  = state.toUpperCase();
-
-      const [segments, total] = await prisma.$transaction([
-        prisma.segment.findMany({
-          where,
-          orderBy: [{ surahId: "asc" }, { verseNumber: "asc" }, { wordPosition: "asc" }],
-          skip:    pg.skip,
-          take:    pg.take,
-          select: {
-            id:             true,
-            wordId:         true,
-            surahId:        true,
-            verseNumber:    true,
-            wordPosition:   true,
-            formArabic:     true,
-            posTag:         true,
-            rootBuckwalter: true,
-            lemmaBuckwalter: true,
-            gramCase:       true,
-            verbAspect:     true,
-            verbMood:       true,
-            verbVoice:      true,
-            verbForm:       true,
-            person:         true,
-            gender:         true,
-            number:         true,
-          },
-        }),
-        prisma.segment.count({ where }),
-      ]);
-
+      const data = await searchMorphological(filters, pg.page, pg.perPage);
       return ok({
         type: "morphological",
-        filters: { pos, aspect, mood, voice, form, person, gender, number, case: gcase, state },
-        ...withPagination(segments, total, pg),
+        filters,
+        engine: "postgres",
+        ...withPagination(data.morphResults ?? [], data.total, pg),
       });
     }
 
-    return badRequest(`Unknown search type "${type}". Use "text", "root", or "morphological"`);
+    return badRequest(`Unknown type "${type}". Use "text", "root", or "morphological"`);
   } catch (err) {
     return serverError(err);
   }

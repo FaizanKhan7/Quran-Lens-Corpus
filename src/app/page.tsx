@@ -70,6 +70,17 @@ export default async function HomePage() {
                 Search a word or root
               </Link>
               <Link
+                href="/ontology"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full
+                  border border-border-base bg-surface-raised text-text-secondary
+                  hover:bg-surface-overlay transition-colors duration-base min-h-touch-min
+                  latin text-latin-sm"
+                aria-label="Browse ontology concepts"
+                dir="ltr"
+              >
+                Ontology →
+              </Link>
+              <Link
                 href="/design-tokens"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full
                   border border-border-base bg-surface-raised text-text-secondary

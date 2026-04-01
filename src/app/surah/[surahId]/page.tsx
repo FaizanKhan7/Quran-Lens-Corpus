@@ -10,6 +10,7 @@ import { VerseAccordion } from "@/components/ui/VerseAccordion";
 import { JumpToVerse } from "@/components/ui/JumpToVerse";
 import { getSurahData } from "@/lib/surah-data";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import { SurahOfflineButton } from "@/components/ui/OfflineDownload";
 
 interface Props {
   params: Promise<{ surahId: string }>;
@@ -123,6 +124,11 @@ export default async function SurahPage({ params }: Props) {
               {surah.versesCount} verse{surah.versesCount !== 1 ? "s" : ""}
             </p>
             <JumpToVerse surahId={id} versesCount={surah.versesCount} />
+          </div>
+
+          {/* ── Save for offline — spec §13.4 ──────────────────────────── */}
+          <div className="mb-4">
+            <SurahOfflineButton surahId={id} />
           </div>
 
           {/* ── Verse list — each row is a VerseAccordion ────────────────── */}

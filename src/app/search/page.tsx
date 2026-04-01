@@ -119,9 +119,6 @@ export default async function SearchPage({ searchParams }: Props) {
               <Suspense>
                 <MorphologicalFilters
                   filters={morphFilters}
-                  onChange={() => {
-                    // onChange is handled client-side via router.push inside the component
-                  }}
                   resultCount={data?.total}
                 />
               </Suspense>

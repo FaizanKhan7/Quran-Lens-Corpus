@@ -197,14 +197,10 @@ function FilterSelect({ label, name, options, value, onChange }: FilterSelectPro
 
 interface MorphologicalFiltersProps {
   filters:      Record<string, string>;
-  onChange:     (filters: Record<string, string>) => void;
   resultCount?: number;
 }
 
-export function MorphologicalFilters({
-  filters: appliedFilters,
-  resultCount,
-}: MorphologicalFiltersProps) {
+export function MorphologicalFilters({ filters: appliedFilters, resultCount }: MorphologicalFiltersProps) {
   const router       = useRouter();
   const pathname     = usePathname();
   const searchParams = useSearchParams();

@@ -247,6 +247,35 @@ model ConceptVerse {
   @@map("concept_verses")
 }
 
+// ─── User Layer ───────────────────────────────────────────────────────────────
+// Users are authenticated via QF OAuth2 (PKCE flow).
+// The userId is the OIDC `sub` claim from the QF identity server.
+// We store user data locally; QF is the identity provider only.
+
+model Bookmark {
+  id          Int      @id @default(autoincrement())
+  userId      String                           // QF OIDC `sub`
+  verseId     String                           // "{surah}:{verse}"
+  wordId      String?                          // "{surah}:{verse}:{position}" (optional)
+  type        BookmarkType @default(verse)
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, verseId, wordId])
+  @@index([userId])
+  @@index([verseId])
+  @@map("bookmarks")
+}
+
+model ReadingSession {
+  id            Int      @id @default(autoincrement())
+  userId        String   @unique                 // QF OIDC `sub`
+  lastSurahId   Int      @default(1)
+  lastVerseNumber Int    @default(1)
+  updatedAt     DateTime @updatedAt
+
+  @@map("reading_sessions")
+}
+
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
 enum RevelationPlace {
@@ -264,4 +293,9 @@ enum NodeType {
   terminal
   non_terminal
   hidden
+}
+
+enum BookmarkType {
+  verse
+  word
 }

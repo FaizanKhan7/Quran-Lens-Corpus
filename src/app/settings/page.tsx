@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { CorpusOfflinePanel } from "@/components/ui/OfflineDownload";
+import { AuthButton } from "@/components/ui/AuthButton";
 
 export const metadata: Metadata = {
   title: "Settings",
@@ -11,9 +13,12 @@ export default function SettingsPage() {
     <>
       <main className="flex-1 px-4 pb-nav" dir="ltr">
         <div className="w-full max-w-[var(--token-layout-max-content)] mx-auto py-8">
-          <h1 className="latin text-2xl font-bold text-[var(--token-text-primary)] mb-8">
-            Settings
-          </h1>
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="latin text-2xl font-bold text-[var(--token-text-primary)]">
+              Settings
+            </h1>
+            <AuthButton />
+          </div>
 
           {/* ── Appearance ─────────────────────────────────────────── */}
           <section className="settings-section" aria-labelledby="settings-appearance">
@@ -30,6 +35,14 @@ export default function SettingsPage() {
               </div>
               <ThemeToggle variant="segment" />
             </div>
+          </section>
+
+          {/* ── Offline ────────────────────────────────────────────── */}
+          <section className="settings-section" aria-labelledby="settings-offline">
+            <h2 id="settings-offline" className="settings-section__title">
+              Offline Access
+            </h2>
+            <CorpusOfflinePanel />
           </section>
 
           {/* ── About ──────────────────────────────────────────────── */}
